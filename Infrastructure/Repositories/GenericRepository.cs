@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MyApp1.Application.Interfaces.Repositories;
 using MyApp1.Domain.Entities;
+using MyApp1.Domain.Interfaces;
 using MyApp1.Infrastructure.Data;
 using System;
 using System.Collections.Generic;

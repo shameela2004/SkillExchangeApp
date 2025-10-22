@@ -1,4 +1,5 @@
-﻿using MyApp1.Domain.Entities;
+﻿using MyApp1.Application.DTOs.Skill;
+using MyApp1.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace MyApp1.Application.Interfaces.Services
         Task<T?> GetByIdAsync(int id);
         Task<IEnumerable<T>> GetAllAsync();
         Task AddAsync(T entity);
-        Task UpdateAsync(int id , T entity);
+        //Task UpdateAsync(int id , UpdateSkillRequest request);
         Task DeleteAsync(int id);
     }
 }

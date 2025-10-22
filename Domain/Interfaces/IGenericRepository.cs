@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyApp1.Application.Interfaces.Repositories
+namespace MyApp1.Domain.Interfaces
 {
     public interface IGenericRepository<T> where T : BaseEntity
     {

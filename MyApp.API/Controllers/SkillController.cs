@@ -1,87 +1,76 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp1.Application.DTOs.Skill;
 using MyApp1.Application.Interfaces.Services;
+using MyApp1.Application.Services;
 using MyApp1.Domain.Entities;
 
-namespace MyApp1.API.Controllers
+[ApiController]
+[Route("api/[controller]")]
+[Authorize]
+public class SkillController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class SkillController : ControllerBase
+    private readonly IGenericService<Skill> _genericService;
+    private readonly ISkillService _skillService;
+
+    public SkillController(IGenericService<Skill> genericService, ISkillService skillService)
     {
-        private readonly IGenericService<Skill> _skillService;
+        _genericService = genericService;
+        _skillService = skillService;
+    }
 
-        public SkillController(IGenericService<Skill> skillService)
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var skills = await _genericService.GetAllAsync();
+        var response = skills.Select(s => new SkillResponse
         {
-            _skillService = skillService;
-        }
+            Id = s.Id,
+            Name = s.Name,
+            CreatedAt = s.CreatedAt,
+            LastUpdatedAt = s.LastUpdatedAt,
+            IsActive = s.IsActive
+        });
+        return Ok(response);
+    }
 
-        // GET: api/Skill
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] CreateSkillRequest request)
+    {
+        var skill = new Skill
         {
-            var skills = await _skillService.GetAllAsync();
-
-            // Map entities to response DTOs
-            var response = skills.Select(s => new SkillResponse
-            {
-                Id = s.Id,
-                Name = s.Name,
-                CreatedAt = s.CreatedAt,
-                LastUpdatedAt = s.LastUpdatedAt,
-                IsActive = s.IsActive
-            });
-
-            return Ok(response);
-        }
-
-        // POST: api/Skill
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateSkillRequest request)
+            Name = request.Name
+        };
+        await _genericService.AddAsync(skill);
+        var response = new SkillResponse
         {
-            var skill = new Skill
-            {
-                Name = request.Name
-            };
+            Id = skill.Id,
+            Name = skill.Name,
+            CreatedAt = skill.CreatedAt,
+            IsActive = skill.IsActive
+        };
+        return Ok(response);
+    }
 
-            await _skillService.AddAsync(skill);
-
-            // Return response DTO
-            var response = new SkillResponse
-            {
-                Id = skill.Id,
-                Name = skill.Name,
-                CreatedAt = skill.CreatedAt,
-                IsActive = skill.IsActive
-            };
-
-            return Ok(response);
-        }
-
-        // PUT: api/Skill/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateSkillRequest request)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateSkillRequest request)
+    {
+        await _skillService.UpdateAsync(id, request);
+        var updatedSkill = await _genericService.GetByIdAsync(id);
+        var response = new SkillResponse
         {
-            var skill = new Skill
-            {
-                Id = id,
-                Name = request.Name,
-                LastUpdatedAt = DateTime.UtcNow
-            };
+            Id = updatedSkill.Id,
+            Name = updatedSkill.Name,
+            LastUpdatedAt = updatedSkill.LastUpdatedAt,
+            IsActive = updatedSkill.IsActive
+        };
+        return Ok(response);
+    }
 
-            await _skillService.UpdateAsync(id, skill);
-
-            var response = new SkillResponse
-            {
-                Id = skill.Id,
-                Name = skill.Name,
-                LastUpdatedAt = skill.LastUpdatedAt,
-                IsActive = skill.IsActive
-            };
-
-            return Ok(response);
-        }
-
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        await _genericService.DeleteAsync(id);
+        return NoContent();
     }
 }
