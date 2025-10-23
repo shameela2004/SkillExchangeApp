@@ -8,6 +8,7 @@ using MyApp1.Application.Services;
 using MyApp1.Domain.Interfaces;
 using MyApp1.Infrastructure.Data;
 using MyApp1.Infrastructure.Repositories;
+using MyApp1.Infrastructure.Seeders;
 using System.Text;
 
 namespace MyApp.API
@@ -57,9 +58,14 @@ namespace MyApp.API
 
 
             // DbContext
-            builder.Services.AddDbContext<MyApp1DbContext>(options => options.UseSqlServer(
-                builder.Configuration.GetConnectionString("DefaultConnection")));
-                
+            //builder.Services.AddDbContext<MyApp1DbContext>(options => options.UseSqlServer(
+            //    builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddDbContext<MyApp1DbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        b => b.MigrationsAssembly("MyApp1.Infrastructure")));
+
+
 
 
 
@@ -103,11 +109,18 @@ namespace MyApp.API
             builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
             builder.Services.AddScoped<ISkillService, SkillService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<ITokenService, TokenService>();
 
 
 
 
             var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<MyApp1DbContext>();
+                DataSeeder.SeedAdminUser(context).GetAwaiter().GetResult();
+            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

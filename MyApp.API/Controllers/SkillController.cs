@@ -33,6 +33,24 @@ public class SkillController : ControllerBase
         });
         return Ok(response);
     }
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+        var skill = await _genericService.GetByIdAsync(id);
+        if (skill == null)
+        {
+            return NotFound();
+        }
+        var response = new SkillResponse
+        {
+            Id = skill.Id,
+            Name = skill.Name,
+            CreatedAt = skill.CreatedAt,
+            LastUpdatedAt = skill.LastUpdatedAt,
+            IsActive = skill.IsActive
+        };
+        return Ok(response);
+    }
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateSkillRequest request)

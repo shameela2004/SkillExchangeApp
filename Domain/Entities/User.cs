@@ -16,9 +16,9 @@ namespace MyApp1.Domain.Entities
         public string? Bio { get; set; }
         public string? ProfilePictureUrl { get; set; }
         public string? Location { get; set; }
-
-        public bool IsMentor { get; set; } = false;
-        public string? MentorStatus { get; set; } // Pending / Approved / Rejected
+        //public bool IsMentor { get; set; } = false;
+        public string Role { get; set; } = "Learner";  // Role for authorization
+        public string? MentorStatus { get; set; } // None / Pending / Approved / Rejected
         public bool IsPremium { get; set; } = false;
 
         // Navigation properties

@@ -20,10 +20,10 @@ namespace MyApp1.Infrastructure.Helpers
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Name ?? string.Empty),
-                new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
-                new Claim(ClaimTypes.Role, user.IsMentor ? "Mentor" : "Learner")
+                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                 new Claim(ClaimTypes.Name, user.Name ?? string.Empty),
+                 new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
+                 new Claim(ClaimTypes.Role, user.Role ?? "Learner")
             };
 
             var tokenDescriptor = new SecurityTokenDescriptor

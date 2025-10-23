@@ -33,6 +33,8 @@ namespace MyApp1.Infrastructure.Data
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Payout> Payouts { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -134,6 +136,38 @@ namespace MyApp1.Infrastructure.Data
             //    .HasForeignKey(p => p.PaymentId)
             //    .OnDelete(DeleteBehavior.Cascade);
 
+
+            modelBuilder.Entity<Booking>()
+    .Property(b => b.PaymentAmount)
+    .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<Payment>()
+                .Property(p => p.Amount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<Payment>()
+                .Property(p => p.CommissionAmount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<Payment>()
+                .Property(p => p.CommissionPercent)
+                .HasColumnType("decimal(5,2)");
+
+            modelBuilder.Entity<Payment>()
+                .Property(p => p.MentorAmount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<Payout>()
+                .Property(po => po.AmountReleased)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<Payout>()
+                .Property(po => po.CommissionAmount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<Session>()
+                .Property(s => s.Price)
+                .HasColumnType("decimal(18,2)");
 
 
 

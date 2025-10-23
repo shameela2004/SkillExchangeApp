@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyApp1.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using MyApp1.Infrastructure.Data;
 namespace MyApp1.Infrastructure.Migrations
 {
     [DbContext(typeof(MyApp1DbContext))]
-    partial class MyApp1DbContextModelSnapshot : ModelSnapshot
+    [Migration("20251023061404_seedingAdmin")]
+    partial class seedingAdmin
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -798,55 +801,6 @@ namespace MyApp1.Infrastructure.Migrations
                     b.ToTable("Ratings");
                 });
 
-            modelBuilder.Entity("MyApp1.Domain.Entities.RefreshToken", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("Expires")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsRevoked")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastLogout")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("LastUpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("LastUpdatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("RefreshTokens");
-                });
-
             modelBuilder.Entity("MyApp1.Domain.Entities.Session", b =>
                 {
                     b.Property<int>("Id")
@@ -1429,17 +1383,6 @@ namespace MyApp1.Infrastructure.Migrations
                     b.Navigation("Session");
 
                     b.Navigation("Skill");
-                });
-
-            modelBuilder.Entity("MyApp1.Domain.Entities.RefreshToken", b =>
-                {
-                    b.HasOne("MyApp1.Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("MyApp1.Domain.Entities.Session", b =>

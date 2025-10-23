@@ -43,5 +43,26 @@ namespace MyApp1.API.Controllers
                 return Unauthorized(new { Error = ex.Message });
             }
         }
+
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh([FromBody] TokenRequest request)
+        {
+            try
+            {
+                var tokens = await _authService.RefreshTokenAsync(request.Token, request.RefreshToken);
+                return Ok(new { token = tokens.Token, refreshToken = tokens.RefreshToken });
+            }
+            catch
+            {
+                return Unauthorized();
+            }
+        }
+
+        [HttpPost("revoke")]
+        public async Task<IActionResult> Revoke([FromBody] TokenRequest request)
+        {
+            await _authService.RevokeRefreshTokenAsync(request.RefreshToken);
+            return NoContent();
+        }
     }
 }

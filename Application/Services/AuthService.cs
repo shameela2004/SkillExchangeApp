@@ -17,11 +17,13 @@ namespace MyApp1.Application.Services
     {
         private readonly IGenericRepository<User> _userRepository;
         private readonly IConfiguration _configuration;
+        private readonly ITokenService _tokenService;
 
-        public AuthService(IGenericRepository<User> userRepository, IConfiguration configuration)
+        public AuthService(IGenericRepository<User> userRepository, IConfiguration configuration,ITokenService tokenService)
         {
             _userRepository = userRepository;
             _configuration = configuration;
+            _tokenService = tokenService;
         }
 
         public async Task RegisterAsync(RegisterRequest request)
@@ -52,14 +54,26 @@ namespace MyApp1.Application.Services
                 throw new Exception("Invalid email or password.");
             }
 
-            var token = JwtHelper.GenerateJwtToken(user, _configuration);
+            var (token, refreshToken) = _tokenService.GenerateTokens(user);
             var expiresIn = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["JwtSettings:ExpiryMinutes"]));
 
             return new JwtTokenResponse
             {
                 Token = token,
+                RefreshToken = refreshToken,
                 Expiration = expiresIn
             };
+        }
+
+        public async Task<(string Token, string RefreshToken)> RefreshTokenAsync(string token, string refreshToken)
+        {
+            var tokens = await _tokenService.RefreshTokenAsync(token, refreshToken);
+            return tokens;
+        }
+
+        public async Task RevokeRefreshTokenAsync(string refreshToken)
+        {
+            await _tokenService.RevokeRefreshToken(refreshToken);
         }
     }
 }
