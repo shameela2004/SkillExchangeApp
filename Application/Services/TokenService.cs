@@ -90,7 +90,6 @@ namespace MyApp1.Application.Services
             // Revoke old refresh token
             storedRefreshToken.IsRevoked = true;
             await _context.SaveChangesAsync();
-
             return GenerateTokens(user);
         }
 
@@ -135,7 +134,6 @@ namespace MyApp1.Application.Services
                 if (!(securityToken is JwtSecurityToken jwtSecurityToken) ||
                     !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
                     throw new SecurityTokenException("Invalid token");
-
                 return principal;
             }
             catch

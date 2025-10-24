@@ -15,7 +15,7 @@ namespace MyApp1.Infrastructure.Seeders
         public static async Task SeedAdminUser(MyApp1DbContext context)
         {
             Console.WriteLine("Running Admin Seeder...");
-            const string adminEmail = "admin@SkillApp.com";
+            const string adminEmail = "admin@SkillLink.com";
 
             if (!context.Users.Any(u => u.Email == adminEmail))
             {
@@ -23,7 +23,7 @@ namespace MyApp1.Infrastructure.Seeders
                 {
                     Name = "Super Admin",
                     Email = adminEmail,
-                    PasswordHash = PasswordHasher.HashPassword("admin@SkillApp.com"), // Replace with your hash method
+                    PasswordHash = PasswordHasher.HashPassword("admin@SkillLink.com"), // Replace with your hash method
                     Role = "Admin",
                     MentorStatus = null // or as needed
                 };

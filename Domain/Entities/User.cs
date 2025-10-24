@@ -22,23 +22,23 @@ namespace MyApp1.Domain.Entities
         public bool IsPremium { get; set; } = false;
 
         // Navigation properties
-        public ICollection<UserSkill>? UserSkills { get; set; }
-        public ICollection<Session>? SessionsAsMentor { get; set; }
-        public ICollection<Booking>? Bookings { get; set; }
-        public ICollection<Group>? GroupsMentoring { get; set; }
-        public ICollection<GroupMember>? GroupMemberships { get; set; }
-        public ICollection<Message>? SentMessages { get; set; }
-        public ICollection<Message>? ReceivedMessages { get; set; }
-        public ICollection<Post>? Posts { get; set; }
-        public ICollection<PostComment>? PostComments { get; set; }
-        public ICollection<Connection>? Connections { get; set; }
-        public ICollection<Rating>? RatingsGiven { get; set; }
-        public ICollection<Rating>? RatingsReceived { get; set; }
-        public ICollection<UserBadge>? UserBadges { get; set; }
-        public ICollection<Subscription>? Subscriptions { get; set; }
-        public ICollection<Notification>? Notifications { get; set; }
-        public ICollection<Payment>? PaymentsAsLearner { get; set; }
-        public ICollection<Payment>? PaymentsAsMentor { get; set; }
-        public ICollection<Payout>? Payouts { get; set; }
+        //public ICollection<UserSkill>? UserSkills { get; set; }
+        //public ICollection<Session>? SessionsAsMentor { get; set; }
+        //public ICollection<Booking>? Bookings { get; set; }
+        //public ICollection<Group>? GroupsMentoring { get; set; }
+        //public ICollection<GroupMember>? GroupMemberships { get; set; }
+        //public ICollection<Message>? SentMessages { get; set; }
+        //public ICollection<Message>? ReceivedMessages { get; set; }
+        //public ICollection<Post>? Posts { get; set; }
+        //public ICollection<PostComment>? PostComments { get; set; }
+        //public ICollection<Connection>? Connections { get; set; }
+        //public ICollection<Rating>? RatingsGiven { get; set; }
+        //public ICollection<Rating>? RatingsReceived { get; set; }
+        //public ICollection<UserBadge>? UserBadges { get; set; }
+        //public ICollection<Subscription>? Subscriptions { get; set; }
+        //public ICollection<Notification>? Notifications { get; set; }
+        //public ICollection<Payment>? PaymentsAsLearner { get; set; }
+        //public ICollection<Payment>? PaymentsAsMentor { get; set; }
+        //public ICollection<Payout>? Payouts { get; set; }
     }
 }

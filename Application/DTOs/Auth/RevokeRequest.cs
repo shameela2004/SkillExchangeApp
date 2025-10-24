@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyApp1.Application.DTOs.Skill
+namespace MyApp1.Application.DTOs.Auth
 {
-    public class UpdateSkillRequest
+    public class RevokeRequest
     {
-        public string Name { get; set; } = string.Empty;
+        public string RefreshToken { get; set; } = string.Empty;
+
     }
 }

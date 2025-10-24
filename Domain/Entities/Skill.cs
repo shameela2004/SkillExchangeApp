@@ -13,10 +13,10 @@ namespace MyApp1.Domain.Entities
         public string Name { get; set; } = string.Empty;
 
         // Navigation
-        public ICollection<UserSkill>? UserSkills { get; set; }
-        public ICollection<Session>? Sessions { get; set; }
-        public ICollection<Group>? Groups { get; set; }
-        public ICollection<Rating>? Ratings { get; set; }
-        public ICollection<UserBadge>? UserBadges { get; set; }
+        //public ICollection<UserSkill>? UserSkills { get; set; }
+        //public ICollection<Session>? Sessions { get; set; }
+        //public ICollection<Group>? Groups { get; set; }
+        //public ICollection<Rating>? Ratings { get; set; }
+        //public ICollection<UserBadge>? UserBadges { get; set; }
     }
 }

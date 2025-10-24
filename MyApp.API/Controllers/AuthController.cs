@@ -59,7 +59,7 @@ namespace MyApp1.API.Controllers
         }
 
         [HttpPost("revoke")]
-        public async Task<IActionResult> Revoke([FromBody] TokenRequest request)
+        public async Task<IActionResult> Revoke([FromBody] RevokeRequest request)
         {
             await _authService.RevokeRefreshTokenAsync(request.RefreshToken);
             return NoContent();
