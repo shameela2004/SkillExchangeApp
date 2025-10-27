@@ -25,7 +25,8 @@ namespace MyApp1.Infrastructure.Seeders
                     Email = adminEmail,
                     PasswordHash = PasswordHasher.HashPassword("admin@SkillLink.com"), // Replace with your hash method
                     Role = "Admin",
-                    MentorStatus = null // or as needed
+                    MentorStatus = null ,
+                    IsEmailVerified = true
                 };
 
                 context.Users.Add(adminUser);

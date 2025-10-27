@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MyApp1.Domain.Entities
 {
-    public class UserReport
+    public class UserReport :BaseEntity
     {
         public int Id { get; set; }
         public int ReportedUserId { get; set; }
@@ -16,7 +16,7 @@ namespace MyApp1.Domain.Entities
         public string Reason { get; set; }
         public string Status { get; set; } = "Pending"; // Pending, Reviewed, ActionTaken
         public string AdminNote { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        //public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? ReviewedAt { get; set; }
     }
 }

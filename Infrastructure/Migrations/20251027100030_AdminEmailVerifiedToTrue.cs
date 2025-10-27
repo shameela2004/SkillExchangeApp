@@ -5,7 +5,7 @@
 namespace MyApp1.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class adminSeed : Migration
+    public partial class AdminEmailVerifiedToTrue : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

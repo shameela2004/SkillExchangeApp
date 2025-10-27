@@ -53,6 +53,10 @@ namespace MyApp1.Application.Services
             {
                 throw new Exception("Invalid email or password.");
             }
+            if (!user.IsEmailVerified)
+            {
+                throw new Exception("Email is not verified. Please verify your email before logging in.");
+            }
 
             var (token, refreshToken) = _tokenService.GenerateTokens(user);
             var expiresIn = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["JwtSettings:ExpiryMinutes"]));

@@ -110,7 +110,8 @@ namespace MyApp.API
             builder.Services.AddScoped<ISkillService, SkillService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<ITokenService, TokenService>();
-
+            builder.Services.AddScoped<IEmailSenderService, EmailSenderSevice>();
+            builder.Services.AddScoped<IOtpService, OtpService>();
 
 
 

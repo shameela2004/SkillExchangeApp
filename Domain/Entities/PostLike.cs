@@ -6,15 +6,12 @@ using System.Threading.Tasks;
 
 namespace MyApp1.Domain.Entities
 {
-    public class Subscription : BaseEntity
+    public class PostLike : BaseEntity
     {
+        public int PostId { get; set; }
+        public Post Post { get; set; } = null!;
         public int UserId { get; set; }
         public User User { get; set; } = null!;
-
-        public int PlanId { get; set; }
-        public SubscriptionPlan Plan { get; set; } = null!;
-
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateTime LikedAt { get; set; } = DateTime.UtcNow;
     }
 }
