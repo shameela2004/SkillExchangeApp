@@ -9,7 +9,7 @@ namespace MyApp1.Application.DTOs.User
 {
     public class UserDto
     {
-        public int Id { get; set; }
+        //public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string? Bio { get; set; }
         public string? Location { get; set; }

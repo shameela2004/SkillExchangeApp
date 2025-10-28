@@ -23,6 +23,16 @@ namespace MyApp1.Application.Common.Mappings
             CreateMap<UpdateUserDto, User>()
                 .ForMember(dest => dest.UserSkills, opt => opt.Ignore()) // Skills not updated here
                 .ForMember(dest => dest.Id, opt => opt.Ignore());          // Prevent Id overwrite
+            CreateMap<UserSkill, UserSkillDto>()
+                .ForMember(dest => dest.SkillName, opt => opt.MapFrom(src => src.Skill.Name));
+
+            CreateMap<UserBadge, UserBadgeDto>()
+    .ForMember(dest => dest.BadgeName, opt => opt.MapFrom(src => src.Badge.Name))
+    .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Badge.Description))
+    .ForMember(dest => dest.SkillName, opt => opt.MapFrom(src => src.Skill != null ? src.Skill.Name : null))
+    .ForMember(dest => dest.EarnedAt, opt => opt.MapFrom(src => src.CreatedAt));
+
+
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MyApp1.Application.DTOs.User;
 using MyApp1.Application.Interfaces.Services;
 using MyApp1.Domain.Entities;
 using MyApp1.Domain.Interfaces;
@@ -35,7 +36,7 @@ namespace MyApp1.Infrastructure.Services
                 .Include(u => u.UserSkills)
                     .ThenInclude(us => us.Skill)
                 .Include(u => u.UserBadges)
-                .FirstOrDefaultAsync(u => u.Id == id && !u.IsDeleted);
+                .FirstOrDefaultAsync(u => u.Id == id && !u.IsDeleted && u.Role != "Admin");
         }
 
         public async Task<bool> UpdateUserAsync(User updatedUser)
@@ -55,35 +56,41 @@ namespace MyApp1.Infrastructure.Services
             return true;
         }
 
-        public async Task<IEnumerable<User>> SearchUsersAsync(string? skill, string? location)
+        public async Task<bool> ApplyMentorAsync(int userId, MentorApplicationDto dto)
         {
-            var query = _userRepository.Table.AsQueryable().Where(u => !u.IsDeleted);
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null || user.IsDeleted)
+                return false;
 
-            if (!string.IsNullOrWhiteSpace(skill))
+            if (user.MentorStatus == "Pending" || user.MentorStatus == "Approved")
+                return false; // Already applied or mentor
+
+            var mentorProfile = new MentorProfile
             {
-                query = query.Where(u => u.UserSkills.Any(us => us.Skill.Name.Contains(skill)));
-            }
+                UserId = userId,
+                PhoneNumber = dto.PhoneNumber,
+                AadhaarImageUrl = dto.AadhaarImageUrl,
+                SocialProfileUrl = dto.SocialProfileUrl,
+                Availabilities = new List<MentorAvailability>()
+                // Add default or empty availabilities or accept via DTO later
+            };
 
-            if (!string.IsNullOrWhiteSpace(location))
-            {
-                query = query.Where(u => u.Location != null && u.Location.Contains(location));
-            }
-
-            return await query.ToListAsync();
-        }
-
-        public async Task<bool> ApplyMentorAsync(MentorProfile mentorProfile)
-        {
-            // Check if user already has a mentor profile
-            var existingProfile = await _mentorProfileRepository.Table
-                .FirstOrDefaultAsync(mp => mp.UserId == mentorProfile.UserId);
-
-            if (existingProfile != null)
-                return false; // Already applied or approved
-
-            // Insert new mentor profile with Pending status managed elsewhere
             await _mentorProfileRepository.AddAsync(mentorProfile);
+
+            user.MentorStatus = "Pending";
+
+            await _userRepository.UpdateAsync(user);
             return true;
+        }
+        public async Task<string> GetMentorApplicationStatusAsync(int userId)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+
+            if (user == null || user.IsDeleted)
+                return string.Empty;
+
+            // Return MentorStatus: None / Pending / Approved / Rejected or default "None"
+            return user.MentorStatus ?? "None";
         }
 
         public async Task<IEnumerable<UserBadge>> GetUserBadgesAsync(int userId)
@@ -94,5 +101,38 @@ namespace MyApp1.Infrastructure.Services
                 .Where(ub => ub.UserId == userId)
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<User>> SearchUsersAsync(SearchUserDto filter)
+        {
+            var query = _userRepository.Table
+                .Include(u => u.UserSkills)
+                    .ThenInclude(us => us.Skill)
+                .Where(u => !u.IsDeleted && u.Role != "Admin");
+
+            if (!string.IsNullOrWhiteSpace(filter.Skill))
+            {
+                query = query.Where(u => u.UserSkills.Any(us => us.Skill.Name.Contains(filter.Skill)));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filter.Location))
+            {
+                query = query.Where(u => u.Location != null && u.Location.Contains(filter.Location));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filter.Role))
+            {
+                if (filter.Role.Equals("Mentor", StringComparison.OrdinalIgnoreCase))
+                {
+                    query = query.Where(u => u.MentorStatus == "Approved"); // Only approved mentors
+                }
+                else if (filter.Role.Equals("Learner", StringComparison.OrdinalIgnoreCase))
+                {
+                    query = query.Where(u => u.Role == "Learner");
+                }
+                // For “Both” or empty skip filtering
+            }
+            return await query.ToListAsync();
+        }
+
     }
 }

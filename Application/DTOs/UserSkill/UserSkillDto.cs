@@ -10,6 +10,6 @@ namespace MyApp1.Application.DTOs.UserSkill
     {
         public int SkillId { get; set; }
         public string SkillName { get; set; } = string.Empty;
-        public string Type { get; set; } = string.Empty;  // Learn / Teach
+        public string Type { get; set; } = string.Empty;  // Learn or Teach
     }
 }

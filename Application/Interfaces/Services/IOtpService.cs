@@ -11,6 +11,7 @@ namespace MyApp1.Application.Interfaces.Services
         Task GenerateAndSendOtpAsync( string email, string purpose);
         Task<bool> VerifyOtpAsync(int userId, string otpCode, string purpose);
         Task ResetPasswordAsync(int userId, string otpCode, string newPassword, string confirmPassword);
+        Task ChangePasswordAsync(int userId, string currentPassword, string newPassword, string confirmPassword);
 
     }
 }

@@ -107,6 +107,20 @@ namespace MyApp1.Application.Services
             await _userRepo.UpdateAsync(user);
         }
 
+        public async Task ChangePasswordAsync(int userId, string currentPassword, string newPassword, string confirmPassword)
+        {
+            if (newPassword != confirmPassword)
+                throw new Exception("New password and confirmation do not match.");
+
+            var user = await _userRepo.GetByIdAsync(userId);
+            if (user == null) throw new Exception("User not found.");
+
+            if (!PasswordHasher.VerifyPassword(currentPassword, user.PasswordHash))
+                throw new Exception("Current password is incorrect.");
+
+            user.PasswordHash = PasswordHasher.HashPassword(newPassword);
+            await _userRepo.UpdateAsync(user);
+        }
 
 
     }
