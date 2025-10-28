@@ -3,10 +3,14 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using MyApp1.API.Extensions;
+using MyApp1.Application.Common.Mappings;
+using MyApp1.Application.DependencyInjection;
 using MyApp1.Application.Interfaces.Services;
 using MyApp1.Application.Services;
 using MyApp1.Domain.Interfaces;
 using MyApp1.Infrastructure.Data;
+using MyApp1.Infrastructure.DependencyInjection;
 using MyApp1.Infrastructure.Repositories;
 using MyApp1.Infrastructure.Seeders;
 using System.Text;
@@ -55,15 +59,10 @@ namespace MyApp.API
             });
 
 
-
-
-            // DbContext
-            //builder.Services.AddDbContext<MyApp1DbContext>(options => options.UseSqlServer(
-            //    builder.Configuration.GetConnectionString("DefaultConnection")));
-            builder.Services.AddDbContext<MyApp1DbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        b => b.MigrationsAssembly("MyApp1.Infrastructure")));
+    //        builder.Services.AddDbContext<MyApp1DbContext>(options =>
+    //options.UseSqlServer(
+    //    builder.Configuration.GetConnectionString("DefaultConnection"),
+    //    b => b.MigrationsAssembly("MyApp1.Infrastructure")));
 
 
 
@@ -97,26 +96,13 @@ namespace MyApp.API
             });
 
 
-
-
-
-
-            // Registering Repositories
-            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-
-
-            // Registering Services
-            builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
-            builder.Services.AddScoped<ISkillService, SkillService>();
-            builder.Services.AddScoped<IAuthService, AuthService>();
-            builder.Services.AddScoped<ITokenService, TokenService>();
-            builder.Services.AddScoped<IEmailSenderService, EmailSenderSevice>();
-            builder.Services.AddScoped<IOtpService, OtpService>();
-
+            builder.Services.AddApplicationServices();
+            builder.Services.AddInfrastructureServices(builder.Configuration);
 
 
             var app = builder.Build();
 
+            app.UseGlobalExceptionHandler();
             using (var scope = app.Services.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<MyApp1DbContext>();

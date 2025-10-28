@@ -6,6 +6,7 @@ using MyApp1.Domain.Interfaces;
 using MyApp1.Infrastructure.Helpers;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Text;
@@ -19,7 +20,7 @@ namespace MyApp1.Application.Services
         private readonly IConfiguration _configuration;
         private readonly ITokenService _tokenService;
 
-        public AuthService(IGenericRepository<User> userRepository, IConfiguration configuration,ITokenService tokenService)
+        public AuthService(IGenericRepository<User> userRepository, IConfiguration configuration, ITokenService tokenService)
         {
             _userRepository = userRepository;
             _configuration = configuration;
@@ -31,7 +32,7 @@ namespace MyApp1.Application.Services
             var existingUser = (await _userRepository.FindAsync(u => u.Email == request.Email)).FirstOrDefault();
             if (existingUser != null)
             {
-                throw new Exception("User with this email already exists.");
+                throw new ValidationException("User with this email already exists.");
             }
 
             var user = new User
@@ -51,11 +52,11 @@ namespace MyApp1.Application.Services
 
             if (user == null || !PasswordHasher.VerifyPassword(request.Password, user.PasswordHash))
             {
-                throw new Exception("Invalid email or password.");
+                throw new ValidationException("Invalid email or password.");
             }
             if (!user.IsEmailVerified)
             {
-                throw new Exception("Email is not verified. Please verify your email before logging in.");
+                throw new ValidationException("Email is not verified. Please verify your email before logging in.");
             }
 
             var (token, refreshToken) = _tokenService.GenerateTokens(user);

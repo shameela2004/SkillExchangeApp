@@ -1,0 +1,49 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using MyApp1.Application.Common.Mappings;
+using MyApp1.Application.DependencyInjection;
+using MyApp1.Application.Interfaces.Services;
+using MyApp1.Application.Services;
+using MyApp1.Domain.Entities;
+using MyApp1.Domain.Interfaces;
+using MyApp1.Infrastructure.Data;
+using MyApp1.Infrastructure.Repositories;
+using MyApp1.Infrastructure.Services;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace MyApp1.Infrastructure.DependencyInjection
+{
+    public static class DependencyInjectionConfig
+    {
+        public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddDbContext<MyApp1DbContext>(options =>
+            options.UseSqlServer(
+                configuration.GetConnectionString("DefaultConnection"),
+                b => b.MigrationsAssembly("MyApp1.Infrastructure")));
+
+            // Registering Repositories
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+
+            // Registering Services
+            services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IEmailSenderService, EmailSenderSevice>();
+            services.AddScoped<ISkillService, SkillService>();
+            services.AddScoped<IOtpService, OtpService>();
+            services.AddScoped<IUserService, UserService>();
+
+
+
+
+            return services;
+        }
+    }
+}

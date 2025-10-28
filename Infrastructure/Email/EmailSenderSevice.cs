@@ -16,12 +16,15 @@ namespace MyApp1.Application.Services
         private readonly int _smtpPort;
         private readonly string _smtpUsername;
         private readonly string _smtpPassword;
-        public EmailSenderSevice(IConfiguration configuration) {
+
+        public EmailSenderSevice(IConfiguration configuration)
+        {
             _smtpHost = configuration["Email:SmtpHost"];
             _smtpPort = int.Parse(configuration["Email:SmtpPort"]);
             _smtpUsername = configuration["Email:SmtpUser"];
             _smtpPassword = configuration["Email:SmtpPass"];
         }
+
         public async Task SendEmailAsync(string toEmail, string subject, string body)
         {
             var mailMessage = new MailMessage()
@@ -31,6 +34,7 @@ namespace MyApp1.Application.Services
                 Body = body,
                 IsBodyHtml = true
             };
+
             mailMessage.To.Add(toEmail);
 
             using var smtpClient = new SmtpClient(_smtpHost, _smtpPort)

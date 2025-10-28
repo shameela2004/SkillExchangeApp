@@ -7,12 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Common\Mappings\" />
-    <Folder Include="Exceptions\" />
+    <Folder Include="Services\" />
     <Folder Include="Validators\" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="15.1.0" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.10">
       <PrivateAssets>all</PrivateAssets>
@@ -27,7 +28,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Domain\MyApp1.Domain.csproj" />
-	<ProjectReference Include="..\Infrastructure\MyApp1.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

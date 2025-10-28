@@ -43,5 +43,6 @@ namespace MyApp1.Domain.Entities
         public ICollection<Payment>? PaymentsAsMentor { get; set; }
         public ICollection<Payout>? Payouts { get; set; }
         public ICollection<OtpVerification>? OtpVerifications { get; set; }
+        public MentorProfile? MentorProfile { get; set; }
     }
 }

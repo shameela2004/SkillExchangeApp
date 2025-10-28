@@ -42,9 +42,10 @@ namespace MyApp1.Infrastructure.Repositories
             await _dbSet.AddAsync(entity);
         }
 
-        public void Update(T entity)
+        public async Task UpdateAsync(T entity)
         {
             _dbSet.Update(entity);
+            await _context.SaveChangesAsync();
         }
 
         public void Remove(T entity)
@@ -58,5 +59,7 @@ namespace MyApp1.Infrastructure.Repositories
         {
             return await _context.SaveChangesAsync();
         }
+        public IQueryable<T> Table => _dbSet.AsQueryable();
+
     }
 }

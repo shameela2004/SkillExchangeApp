@@ -15,8 +15,9 @@ namespace MyApp1.Domain.Interfaces
         Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
 
         Task AddAsync(T entity);
-        void Update(T entity);
-        void Remove(T entity);
+        Task UpdateAsync(T entity);  
+         void Remove(T entity);
         Task<int> SaveChangesAsync();
+        IQueryable<T> Table { get; }
     }
 }

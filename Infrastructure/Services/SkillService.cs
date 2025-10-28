@@ -1,4 +1,5 @@
 ﻿using MyApp1.Application.DTOs.Skill;
+using MyApp1.Application.Exceptions;
 using MyApp1.Application.Interfaces.Services;
 using MyApp1.Domain.Entities;
 using MyApp1.Domain.Interfaces;
@@ -19,15 +20,16 @@ namespace MyApp1.Application.Services
             _repository = repository;
         }
 
-        public async Task UpdateAsync(int id, UpdateSkillRequest dto)
+        public async Task UpdateSkillAsync(int id, UpdateSkillRequest dto)
         {
             var skill = await _repository.GetByIdAsync(id);
             if (skill == null)
-                throw new KeyNotFoundException($"Skill with id {id} not found");
+                throw new NotFoundException($"Skill with id {id} not found");
 
             skill.Name = dto.Name;
             skill.LastUpdatedAt = DateTime.UtcNow;
-            await _repository.SaveChangesAsync();
+
+            await _repository.UpdateAsync(skill);
         }
     }
 }

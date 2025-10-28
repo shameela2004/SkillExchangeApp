@@ -1,4 +1,5 @@
-﻿using MyApp1.Application.Interfaces.Services;
+﻿using MyApp1.Application.Exceptions;
+using MyApp1.Application.Interfaces.Services;
 using MyApp1.Domain.Entities;
 using MyApp1.Domain.Interfaces;
 
@@ -30,10 +31,12 @@ public class GenericService<T> : IGenericService<T> where T : BaseEntity
     public async Task DeleteAsync(int id)
     {
         var entity = await _repository.GetByIdAsync(id);
-        if (entity != null)
+        if (entity == null)
         {
-            _repository.Remove(entity);
-            await _repository.SaveChangesAsync();
+            throw new NotFoundException($"{typeof(T).Name} with id {id} not found.");
         }
+
+        _repository.Remove(entity);
+        await _repository.SaveChangesAsync();
     }
 }

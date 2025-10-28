@@ -9,6 +9,6 @@ namespace MyApp1.Application.Interfaces.Services
 {
     public interface ISkillService
     {
-        Task UpdateAsync(int id, UpdateSkillRequest dto);
+        Task UpdateSkillAsync(int id, UpdateSkillRequest dto);
     }
 }

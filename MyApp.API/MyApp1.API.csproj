@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Middleware\" />
+    <Folder Include="Controllers\AdminControllers\" />
     <Folder Include="Pages\" />
   </ItemGroup>
 

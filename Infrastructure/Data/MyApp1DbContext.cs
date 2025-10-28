@@ -412,8 +412,23 @@ namespace MyApp1.Infrastructure.Data
                       .HasOne(o => o.User)
                        .WithMany(u => u.OtpVerifications) 
                       .HasForeignKey(o => o.UserId)
-                      .OnDelete(DeleteBehavior.Cascade); // or restrict / set null depending on requirement
-
+                      .OnDelete(DeleteBehavior.Cascade);
+            // ==============================
+            // USER ↔ MentorProfile
+            // ==============================
+            modelBuilder.Entity<User>()
+        .HasOne(u => u.MentorProfile)
+        .WithOne(mp => mp.User)
+        .HasForeignKey<MentorProfile>(mp => mp.UserId)
+        .OnDelete(DeleteBehavior.Cascade);
+            // ==============================
+            // MentorProfile ↔ MentorAvailability
+            // ==============================
+            modelBuilder.Entity<MentorAvailability>()
+      .HasOne(ma => ma.MentorProfile)
+      .WithMany(mp => mp.Availabilities)
+      .HasForeignKey(ma => ma.MentorProfileId)
+      .OnDelete(DeleteBehavior.Cascade);
         }
     }
     

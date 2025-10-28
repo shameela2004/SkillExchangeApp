@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyApp1.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using MyApp1.Infrastructure.Data;
 namespace MyApp1.Infrastructure.Migrations
 {
     [DbContext(typeof(MyApp1DbContext))]
-    partial class MyApp1DbContextModelSnapshot : ModelSnapshot
+    [Migration("20251028055900_MentorProfile_AvailabilityTables")]
+    partial class MentorProfile_AvailabilityTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
