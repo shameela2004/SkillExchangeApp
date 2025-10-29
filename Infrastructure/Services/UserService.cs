@@ -15,18 +15,15 @@ namespace MyApp1.Infrastructure.Services
     {
         private readonly IGenericRepository<User> _userRepository;
         private readonly IGenericRepository<UserSkill> _userSkillRepository;
-        private readonly IGenericRepository<MentorProfile> _mentorProfileRepository;
         private readonly IGenericRepository<UserBadge> _userBadgeRepository;
 
         public UserService(
             IGenericRepository<User> userRepository,
             IGenericRepository<UserSkill> userSkillRepository,
-            IGenericRepository<MentorProfile> mentorProfileRepository,
             IGenericRepository<UserBadge> userBadgeRepository)
         {
             _userRepository = userRepository;
             _userSkillRepository = userSkillRepository;
-            _mentorProfileRepository = mentorProfileRepository;
             _userBadgeRepository = userBadgeRepository;
         }
 
@@ -56,42 +53,7 @@ namespace MyApp1.Infrastructure.Services
             return true;
         }
 
-        public async Task<bool> ApplyMentorAsync(int userId, MentorApplicationDto dto)
-        {
-            var user = await _userRepository.GetByIdAsync(userId);
-            if (user == null || user.IsDeleted)
-                return false;
-
-            if (user.MentorStatus == "Pending" || user.MentorStatus == "Approved")
-                return false; // Already applied or mentor
-
-            var mentorProfile = new MentorProfile
-            {
-                UserId = userId,
-                PhoneNumber = dto.PhoneNumber,
-                AadhaarImageUrl = dto.AadhaarImageUrl,
-                SocialProfileUrl = dto.SocialProfileUrl,
-                Availabilities = new List<MentorAvailability>()
-                // Add default or empty availabilities or accept via DTO later
-            };
-
-            await _mentorProfileRepository.AddAsync(mentorProfile);
-
-            user.MentorStatus = "Pending";
-
-            await _userRepository.UpdateAsync(user);
-            return true;
-        }
-        public async Task<string> GetMentorApplicationStatusAsync(int userId)
-        {
-            var user = await _userRepository.GetByIdAsync(userId);
-
-            if (user == null || user.IsDeleted)
-                return string.Empty;
-
-            // Return MentorStatus: None / Pending / Approved / Rejected or default "None"
-            return user.MentorStatus ?? "None";
-        }
+     
 
         public async Task<IEnumerable<UserBadge>> GetUserBadgesAsync(int userId)
         {

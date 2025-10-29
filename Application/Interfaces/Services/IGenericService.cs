@@ -13,7 +13,7 @@ namespace MyApp1.Application.Interfaces.Services
         Task<T?> GetByIdAsync(int id);
         Task<IEnumerable<T>> GetAllAsync();
         Task AddAsync(T entity);
-        //Task UpdateAsync(int id , UpdateSkillRequest request);
+        Task UpdateAsync(T entity);
         Task DeleteAsync(int id);
     }
 }

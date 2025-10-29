@@ -45,11 +45,11 @@ namespace MyApp1.API.Middleware
             };
             context.Response.StatusCode = statusCode;
 
-            var response = new ApiResponse<string>(
-                success: false,
-                data: null,
-                message: exception.Message ?? "Internal Server Error"
-            );
+            var response = ApiResponse<object>.FailResponse(
+        statusCode,
+        exception.Message ?? "Internal Server Error",
+        null // you can optionally pass extra message or null
+             );
 
             var result = JsonSerializer.Serialize(response);
             return context.Response.WriteAsync(result);

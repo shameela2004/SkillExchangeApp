@@ -39,6 +39,10 @@ namespace MyApp1.Infrastructure.DependencyInjection
             services.AddScoped<ISkillService, SkillService>();
             services.AddScoped<IOtpService, OtpService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IMentorService, MentorService>();
+            services.AddScoped<ISessionService, SessionService>();
+            services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<IPostService, PostService>();
 
 
 

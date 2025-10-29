@@ -27,6 +27,10 @@ public class GenericService<T> : IGenericService<T> where T : BaseEntity
         await _repository.AddAsync(entity);
         await _repository.SaveChangesAsync();
     }
+    public async Task UpdateAsync(T entity)
+    {
+        await _repository.UpdateAsync(entity);
+    }
 
     public async Task DeleteAsync(int id)
     {

@@ -32,7 +32,7 @@ public class SkillController : ControllerBase
             LastUpdatedAt = s.LastUpdatedAt,
             IsActive = s.IsActive
         });
-        return Ok(ApiResponse<object>.Ok(response));
+        return Ok(ApiResponse<object>.SuccessResponse(response,StatusCodes.Status200OK));
     }
 
     [HttpGet("{id}")]
@@ -41,7 +41,7 @@ public class SkillController : ControllerBase
         var skill = await _genericService.GetByIdAsync(id);
         if (skill == null)
         {
-            return NotFound(ApiResponse<string>.Fail("Skill not found."));
+            return NotFound(ApiResponse<string>.FailResponse(StatusCodes.Status404NotFound,"Skill not found."));
         }
         var response = new SkillResponse
         {
@@ -51,7 +51,7 @@ public class SkillController : ControllerBase
             LastUpdatedAt = skill.LastUpdatedAt,
             IsActive = skill.IsActive
         };
-        return Ok(ApiResponse<SkillResponse>.Ok(response));
+        return Ok(ApiResponse<SkillResponse>.SuccessResponse(response,StatusCodes.Status200OK));
     }
 
     [HttpPost]
@@ -69,7 +69,7 @@ public class SkillController : ControllerBase
             CreatedAt = skill.CreatedAt,
             IsActive = skill.IsActive
         };
-        return Ok(ApiResponse<SkillResponse>.Ok(response, "Skill created successfully."));
+        return Ok(ApiResponse<SkillResponse>.SuccessResponse(response,StatusCodes.Status200OK, "Skill created successfully."));
     }
 
     [HttpPut("{id}")]

@@ -12,8 +12,6 @@ namespace MyApp1.Application.Interfaces.Services
     {
         Task<User?> GetUserByIdAsync(int id);
         Task<bool> UpdateUserAsync(User user);
-        Task<bool> ApplyMentorAsync(int userId, MentorApplicationDto dto);
-        Task<string> GetMentorApplicationStatusAsync(int userId);
         Task<IEnumerable<UserBadge>> GetUserBadgesAsync(int userId);
         Task<IEnumerable<User>> SearchUsersAsync(SearchUserDto filter);
     }
