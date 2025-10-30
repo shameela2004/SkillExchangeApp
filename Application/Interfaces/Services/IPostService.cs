@@ -10,9 +10,13 @@ namespace MyApp1.Application.Interfaces.Services
 {
     public interface IPostService
     {
-        Task<IEnumerable<Post>> GetPostsAsync(int page, int pageSize);
+        Task<IEnumerable<Post>> GetPostsAsync(int page, int pageSize, string sortBy, bool descending);
+        Task<Post?> GetPostByIdAsync(int postId);
+
         Task<bool> CreatePostAsync(int userId, CreatePostDto createDto);
-        Task<IEnumerable<PostComment>> GetCommentsByPostIdAsync(int postId);
+        Task<bool> EditPostAsync(int postId, int userId, EditPostDto editDto);
+        Task<bool> DeletePostAsync(int postId);
+        Task<IEnumerable<PostComment>> GetCommentsByPostIdAsync(int postId, int page, int pageSize, string sortBy, bool descending);
         Task<bool> AddCommentAsync(int postId, int userId, string commentText);
         Task<bool> ToggleLikePostAsync(int postId, int userId);
 

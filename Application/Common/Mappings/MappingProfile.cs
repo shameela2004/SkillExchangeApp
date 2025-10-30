@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using MyApp1.Application.DTOs.Connection;
+using MyApp1.Application.DTOs.Language;
 using MyApp1.Application.DTOs.Notification;
 using MyApp1.Application.DTOs.Post;
 using MyApp1.Application.DTOs.Session;
+using MyApp1.Application.DTOs.Skill;
 using MyApp1.Application.DTOs.User;
-using MyApp1.Application.DTOs.UserSkill;
 using MyApp1.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -19,16 +20,17 @@ namespace MyApp1.Application.Common.Mappings
     {
         public MappingProfile() {
             CreateMap<User, UserDto>()
-           .ForMember(dest => dest.Skills, opt => opt.MapFrom(src => src.UserSkills));
-
+           .ForMember(dest => dest.Skills, opt => opt.MapFrom(src => src.UserSkills))
+            .ForMember(dest => dest.Languages, opt => opt.MapFrom(src => src.UserLanguages));
             CreateMap<UserSkill, UserSkillDto>()
                 .ForMember(dest => dest.SkillName, opt => opt.MapFrom(src => src.Skill.Name));
 
-            CreateMap<UpdateUserDto, User>()
-                .ForMember(dest => dest.UserSkills, opt => opt.Ignore()) // Skills not updated here
-                .ForMember(dest => dest.Id, opt => opt.Ignore());          // Prevent Id overwrite
-            CreateMap<UserSkill, UserSkillDto>()
-                .ForMember(dest => dest.SkillName, opt => opt.MapFrom(src => src.Skill.Name));
+
+            //CreateMap<UpdateUserDto, User>()
+            //    .ForMember(dest => dest.UserSkills, opt => opt.Ignore()) // Skills not updated here
+            //    .ForMember(dest => dest.Id, opt => opt.Ignore());          // Prevent Id overwrite
+            //CreateMap<UserSkill, UserSkillDto>()
+            //    .ForMember(dest => dest.SkillName, opt => opt.MapFrom(src => src.Skill.Name));
 
             CreateMap<UserBadge, UserBadgeDto>()
     .ForMember(dest => dest.BadgeName, opt => opt.MapFrom(src => src.Badge.Name))
@@ -75,8 +77,27 @@ namespace MyApp1.Application.Common.Mappings
                 .ForMember(dest => dest.CommentText, opt => opt.MapFrom(src => src.Comment))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt));
 
+            CreateMap<EditPostDto, Post>()
+       .ForMember(dest => dest.Content, opt => opt.MapFrom(src => src.Content))
+       .ForMember(dest => dest.MediaUrl, opt => opt.MapFrom(src => src.MediaUrl));
+
+            // Language Mappings
+            CreateMap<Language, LanguageResponseDto>();
+            CreateMap<UserLanguage, UserLanguageResponseDto>()
+                .ForMember(dest => dest.LanguageName, opt => opt.MapFrom(src => src.Language.Name));
+            CreateMap<AddUserLanguageDto, UserLanguage>();
+            CreateMap<UserLanguage, UserLanguageDto>()
+    .ForMember(dest => dest.LanguageName, opt => opt.MapFrom(src => src.Language.Name));
 
 
+            // Skill Mappings
+            CreateMap<Skill, SkillResponseDto>();
+            CreateMap<UserSkill, UserSkillDto>()
+    .ForMember(dest => dest.SkillName, opt => opt.MapFrom(src => src.Skill.Name));
+
+            CreateMap<UserSkill, UserSkillResponseDto>()
+                .ForMember(dest => dest.SkillName, opt => opt.MapFrom(src => src.Skill.Name));
+            CreateMap<AddUserSkillDto, UserSkill>();
 
         }
     }

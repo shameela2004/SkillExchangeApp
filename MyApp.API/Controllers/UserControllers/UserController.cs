@@ -25,6 +25,13 @@ public class UserController : ControllerBase
         _userGenericService = userGenericService;
         _otpService = otpService;
     }
+    [HttpGet]
+    public async Task<IActionResult> GetAllUsers()
+    {
+        var users = await _userGenericService.GetAllAsync();
+        var userDtos = _mapper.Map<IEnumerable<UserDto>>(users);
+        return Ok(ApiResponse<IEnumerable<UserDto>>.SuccessResponse(userDtos, StatusCodes.Status200OK, "Users fetched"));
+    }
 
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetUserById(int id)

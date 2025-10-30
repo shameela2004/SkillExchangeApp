@@ -37,7 +37,11 @@ namespace MyApp1.Infrastructure.Data
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Payout> Payouts { get; set; }
-
+        public DbSet<SubscriptionPlan> SubscriptionPlans { get; set; }
+        public DbSet<MentorProfile> MentorProfiles { get; set; }
+        public DbSet<MentorAvailability> MentorAvailabilities { get; set; }
+        public DbSet<Language> Languages { get; set; }
+        public DbSet<UserLanguage> UserLanguages { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

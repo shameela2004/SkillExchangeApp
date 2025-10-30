@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyApp1.Application.DTOs.Skill
+namespace MyApp1.Application.DTOs.Language
 {
-    public class CreateSkillRequest
+    public class LanguageResponseDto
     {
+        public int Id { get; set; }
+        public string Code { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
     }
 }

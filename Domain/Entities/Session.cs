@@ -23,6 +23,8 @@ namespace MyApp1.Domain.Entities
         public string Mode { get; set; } = string.Empty; // Online / Offline
         public string? Notes { get; set; }
         public decimal Price { get; set; }
+        public bool IsCompleted { get; set; } = false;
+
         public bool IsPremiumAccessible { get; set; } = false;
         public string? VideoLink { get; set; }
 

@@ -30,8 +30,10 @@ namespace MyApp1.Infrastructure.Services
         public async Task<User?> GetUserByIdAsync(int id)
         {
             return await _userRepository.Table
-                .Include(u => u.UserSkills)
+                .Include(u => u.UserSkills.Where(us => !us.IsDeleted))
                     .ThenInclude(us => us.Skill)
+                 .Include(u => u.UserLanguages.Where(us => !us.IsDeleted))
+                    .ThenInclude(ul => ul.Language)
                 .Include(u => u.UserBadges)
                 .FirstOrDefaultAsync(u => u.Id == id && !u.IsDeleted && u.Role != "Admin");
         }

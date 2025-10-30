@@ -1,4 +1,5 @@
-﻿using MyApp1.Application.DTOs.UserSkill;
+﻿using MyApp1.Application.DTOs.Language;
+using MyApp1.Application.DTOs.Skill;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,5 +16,6 @@ namespace MyApp1.Application.DTOs.User
         public string? Location { get; set; }
         public string? ProfilePictureUrl { get; set; }
         public ICollection<UserSkillDto>? Skills { get; set; }
+        public ICollection<UserLanguageDto>? Languages { get; set; }
     }
 }

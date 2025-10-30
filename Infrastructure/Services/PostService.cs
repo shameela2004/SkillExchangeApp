@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MyApp1.Application.DTOs.Post;
 using MyApp1.Application.Interfaces.Services;
+using MyApp1.Application.Utils;
 using MyApp1.Domain.Entities;
 using MyApp1.Domain.Interfaces;
 using System;
@@ -16,23 +17,48 @@ namespace MyApp1.Infrastructure.Services
         private readonly IGenericRepository<Post> _postRepository;
         private readonly IGenericRepository<PostComment> _postCommentRepository;
         private readonly IGenericRepository<PostLike> _postLikeRepository;
+        private readonly IGenericService<Notification> _notificationService;
+        private readonly IGenericRepository<User> _userRepository;
+        private readonly SocialTextParser _textParser;
         public PostService(
             IGenericRepository<Post> postRepository,
             IGenericRepository<PostComment> postCommentRepository,
-            IGenericRepository<PostLike> postLikeRepository)
+            IGenericRepository<PostLike> postLikeRepository,
+            IGenericRepository<User> userRepository,
+            IGenericService<Notification> notificationService,
+            SocialTextParser textParser
+            )
         {
             _postRepository = postRepository;
             _postCommentRepository = postCommentRepository;
             _postLikeRepository = postLikeRepository;
+            _userRepository = userRepository;
+            _notificationService = notificationService;
+            _textParser = textParser;
         }
-        public async Task<IEnumerable<Post>> GetPostsAsync(int page, int pageSize)
+        public async Task<IEnumerable<Post>> GetPostsAsync(int page, int pageSize, string sortBy, bool descending)
         {
-            return await _postRepository.Table
-                .Include(p => p.User)
-                .OrderByDescending(p => p.CreatedAt)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            IQueryable<Post> query = _postRepository.Table.Include(p => p.User);
+
+            // Sorting
+            query = (sortBy.ToLower(), descending) switch
+            {
+                ("createdat", true) => query.OrderByDescending(p => p.CreatedAt),
+                ("createdat", false) => query.OrderBy(p => p.CreatedAt),
+                ("likecount", true) => query.OrderByDescending(p => p.LikeCount),
+                ("likecount", false) => query.OrderBy(p => p.LikeCount),
+                ("commentcount", true) => query.OrderByDescending(p => p.CommentCount),
+                ("commentcount", false) => query.OrderBy(p => p.CommentCount),
+                _ => query.OrderByDescending(p => p.CreatedAt)
+            };
+
+            // Paging
+            return await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+        }
+
+        public async Task<Post?> GetPostByIdAsync(int postId)
+        {
+            return await _postRepository.GetByIdAsync(postId);
         }
 
         public async Task<bool> CreatePostAsync(int userId, CreatePostDto createDto)
@@ -48,16 +74,63 @@ namespace MyApp1.Infrastructure.Services
             };
             await _postRepository.AddAsync(post);
             await _postRepository.SaveChangesAsync();
+            // Parse mentions and notify users
+            var (mentionedUsernames, _) = _textParser.ParseMentionsAndHashtags(createDto.Content);
+            foreach (var username in mentionedUsernames)
+            {
+                var user = await _userRepository.Table.FirstOrDefaultAsync(u => u.Name == username);
+                if (user != null)
+                {
+                    await _notificationService.AddAsync(new Notification
+                    {
+                        UserId = user.Id,
+                        Title = "You were mentioned",
+                        Message = $"You were mentioned by {post.UserId} in a post.",
+                        CreatedAt = DateTime.UtcNow
+                    });
+                }
+            }
             return true;
         }
-        public async Task<IEnumerable<PostComment>> GetCommentsByPostIdAsync(int postId)
+        public async Task<bool> EditPostAsync(int postId, int userId, EditPostDto editDto)
         {
-            return await _postCommentRepository.Table
-                .Include(c => c.User)
-                .Where(c => c.PostId == postId)
-                .OrderBy(c => c.CreatedAt)
-                .ToListAsync();
+            var post = await _postRepository.GetByIdAsync(postId);
+            if (post == null || post.UserId != userId)
+                return false;
+
+            post.Content = editDto.Content;
+            post.MediaUrl = editDto.MediaUrl;
+
+            await _postRepository.UpdateAsync(post);
+            return true;
         }
+        public async Task<bool> DeletePostAsync(int postId)
+        {
+            var post = await _postRepository.GetByIdAsync(postId);
+            if (post == null) return false;
+
+            // Optional: Handle cascading deletion of comments, likes here if not configured in DB
+
+            _postRepository.Remove(post);
+            await _postRepository.SaveChangesAsync();
+            return true;
+        }
+
+        //Post Commments
+        public async Task<IEnumerable<PostComment>> GetCommentsByPostIdAsync(int postId, int page, int pageSize, string sortBy, bool descending)
+        {
+            IQueryable<PostComment> query = _postCommentRepository.Table.Include(c => c.User).Where(c => c.PostId == postId);
+
+            query = (sortBy.ToLower(), descending) switch
+            {
+                ("createdat", true) => query.OrderByDescending(c => c.CreatedAt),
+                ("createdat", false) => query.OrderBy(c => c.CreatedAt),
+                _ => query.OrderByDescending(c => c.CreatedAt)
+            };
+
+            return await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+        }
+
 
 
         public async Task<bool> AddCommentAsync(int postId, int userId, string commentText)
@@ -74,9 +147,28 @@ namespace MyApp1.Infrastructure.Services
             await _postCommentRepository.AddAsync(comment);
             post.CommentCount += 1;
             await _postRepository.UpdateAsync(post);
+            // Parse mentions in comment
+            var (mentionedUsernames, _) = _textParser.ParseMentionsAndHashtags(commentText);
+
+            // Notify mentioned users
+            foreach (var username in mentionedUsernames)
+            {
+                var mentionedUser = await _userRepository.Table.FirstOrDefaultAsync(u => u.Name == username);
+                if (mentionedUser != null)
+                {
+                    await _notificationService.AddAsync(new Notification
+                    {
+                        UserId = mentionedUser.Id,
+                        Title = "You were mentioned in a comment",
+                        Message = $"You were mentioned by {userId} in a comment.",
+                        CreatedAt = DateTime.UtcNow
+                    });
+                }
+            }
             return true;
         }
 
+        // Post Likes
         public async Task<bool> ToggleLikePostAsync(int postId, int userId)
         {
             var existingLike = await _postLikeRepository.Table

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MyApp1.Application.Interfaces.Services;
 using MyApp1.Domain.Entities;
 using MyApp1.Domain.Interfaces;
 using System;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace MyApp1.Infrastructure.Services
 {
-    public class ConnectionService
+    public class ConnectionService :IConnectionService
     {
         private readonly IGenericRepository<Connection> _connectionRepository;
         public ConnectionService(IGenericRepository<Connection> connectionRepository)

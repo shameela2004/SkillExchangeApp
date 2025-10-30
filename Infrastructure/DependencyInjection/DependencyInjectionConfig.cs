@@ -36,13 +36,16 @@ namespace MyApp1.Infrastructure.DependencyInjection
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IEmailSenderService, EmailSenderSevice>();
-            services.AddScoped<ISkillService, SkillService>();
+            //services.AddScoped<ISkillService, SkillService>();
             services.AddScoped<IOtpService, OtpService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IMentorService, MentorService>();
             services.AddScoped<ISessionService, SessionService>();
             services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<IConnectionService, ConnectionService>();
             services.AddScoped<IPostService, PostService>();
+            services.AddScoped<IUserLanguageService, UserLanguageService>();
+            services.AddScoped<IUserSkillService, UserSkillService>();
 
 
 

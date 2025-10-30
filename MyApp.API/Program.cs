@@ -23,8 +23,6 @@ namespace MyApp.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-
             builder.Services.AddControllers();
 
             //// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -57,15 +55,6 @@ namespace MyApp.API
         }
     });
             });
-
-
-    //        builder.Services.AddDbContext<MyApp1DbContext>(options =>
-    //options.UseSqlServer(
-    //    builder.Configuration.GetConnectionString("DefaultConnection"),
-    //    b => b.MigrationsAssembly("MyApp1.Infrastructure")));
-
-
-
 
 
             // Jwt Authentication

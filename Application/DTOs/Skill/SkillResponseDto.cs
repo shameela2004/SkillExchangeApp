@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace MyApp1.Application.DTOs.Skill
 {
-    public class UpdateSkillRequest
+    public class SkillResponseDto
     {
+        public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
     }
+
 }
