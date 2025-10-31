@@ -7,7 +7,7 @@ using MyApp1.Application.Interfaces.Services;
 
 namespace MyApp1.API.Controllers.AdminControllers
 {
-    [Route("api/[controller]")]
+    [Route("api/admin/sessions")]
     [ApiController]
     public class AdminSessionController : ControllerBase
     {
@@ -20,13 +20,13 @@ namespace MyApp1.API.Controllers.AdminControllers
             _mapper = mapper;
         }
 
-        // GET: api/admin/sessions
         [HttpGet]
         public async Task<IActionResult> GetAllSessions()
         {
-            var sessions = await _sessionService.GetAllSessionsAsync();
-            var sessionDtos = _mapper.Map<IEnumerable<SessionDto>>(sessions);
-            return Ok(ApiResponse<IEnumerable<SessionDto>>.SuccessResponse(sessionDtos, StatusCodes.Status200OK, "All sessions fetched successfully"));
+            var sessions = await _sessionService.GetSessionsForUserAsync(0, "all"); 
+            var dto = _mapper.Map<IEnumerable<SessionDto>>(sessions);
+            return Ok(ApiResponse<IEnumerable<SessionDto>>.SuccessResponse(dto, StatusCodes.Status200OK, "All sessions fetched"));
         }
     }
+
 }

@@ -31,25 +31,58 @@ namespace MyApp1.API.Controllers.UserControllers
                 return BadRequest(ApiResponse<string>.FailResponse(StatusCodes.Status400BadRequest, "Failed to send connection request"));
             return Ok(ApiResponse<string>.SuccessResponse(null, StatusCodes.Status200OK, "Connection request sent"));
         }
+
         [Authorize]
         [HttpPost("connect/accept/{connectionId}")]
         public async Task<IActionResult> AcceptConnection(int connectionId)
         {
-            var success = await _connectionService.AcceptConnectionAsync(connectionId);
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var success = await _connectionService.AcceptConnectionAsync(connectionId, userId);
             if (!success)
                 return BadRequest(ApiResponse<string>.FailResponse(StatusCodes.Status400BadRequest, "Failed to accept connection"));
             return Ok(ApiResponse<string>.SuccessResponse(null, StatusCodes.Status200OK, "Connection accepted"));
         }
+
+        [Authorize]
+        [HttpPost("connect/reject/{connectionId}")]
+        public async Task<IActionResult> RejectConnection(int connectionId)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var success = await _connectionService.RejectConnectionAsync(connectionId, userId);
+            if (!success)
+                return BadRequest(ApiResponse<string>.FailResponse(StatusCodes.Status400BadRequest, "Failed to reject connection"));
+            return Ok(ApiResponse<string>.SuccessResponse(null, StatusCodes.Status200OK, "Connection rejected"));
+        }
+
+        [Authorize]
+        [HttpDelete("connect/{connectionId}")]
+        public async Task<IActionResult> DeleteConnection(int connectionId)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var success = await _connectionService.DeleteConnectionAsync(connectionId, userId);
+            if (!success)
+                return BadRequest(ApiResponse<string>.FailResponse(StatusCodes.Status400BadRequest, "Failed to delete connection"));
+            return Ok(ApiResponse<string>.SuccessResponse(null, StatusCodes.Status200OK, "Connection deleted"));
+        }
+
         [Authorize]
         [HttpGet("connections")]
         public async Task<IActionResult> GetConnections()
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
             var connections = await _connectionService.GetUserConnectionsAsync(userId);
-            var connectionDtos = _mapper.Map<IEnumerable<ConnectionDto>>(connections);
-            return Ok(ApiResponse<IEnumerable<ConnectionDto>>.SuccessResponse(connectionDtos, StatusCodes.Status200OK, "Connections fetched"));
+            return Ok(ApiResponse<IEnumerable<ConnectionDto>>.SuccessResponse(connections, StatusCodes.Status200OK, "Connections fetched"));
         }
 
+        [Authorize]
+        [HttpGet("connections/pending")]
+        public async Task<IActionResult> GetPendingConnections()
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var pendingConnections = await _connectionService.GetPendingConnectionsAsync(userId);
+
+            return Ok(ApiResponse<IEnumerable<ConnectionDto>>.SuccessResponse(pendingConnections, StatusCodes.Status200OK, "Pending connections fetched"));
+        }
 
 
     }

@@ -21,16 +21,14 @@ namespace MyApp1.Application.DTOs.Session
     public class SessionDto
     {
         public int Id { get; set; }
-        public int SkillId { get; set; }
         public int MentorId { get; set; }
+        public int SkillId { get; set; }
         public DateTime ScheduledAt { get; set; }
         public string Mode { get; set; } = string.Empty;
         public string Type { get; set; } = string.Empty;
-        public int? GroupId { get; set; }
+        public int? MaxParticipants { get; set; }
         public string? Notes { get; set; }
-        public decimal Price { get; set; }
-        public bool IsPremiumAccessible { get; set; }
-        public string? VideoLink { get; set; }
+        public decimal? Price { get; set; }
         public bool IsCompleted { get; set; }
     }
 

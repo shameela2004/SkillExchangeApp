@@ -46,6 +46,9 @@ namespace MyApp1.Infrastructure.DependencyInjection
             services.AddScoped<IPostService, PostService>();
             services.AddScoped<IUserLanguageService, UserLanguageService>();
             services.AddScoped<IUserSkillService, UserSkillService>();
+            services.AddScoped<IBookingService, BookingService>();
+            services.AddScoped<IGroupSessionService, GroupSessionService>();
+            services.AddScoped<IGroupService, GroupService>();
 
 
 

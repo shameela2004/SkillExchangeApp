@@ -1,14 +1,16 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyApp1.Application.Common;
 using MyApp1.Application.DTOs.Session;
 using MyApp1.Application.Interfaces.Services;
 using MyApp1.Infrastructure.Services;
+using System.Security.Claims;
 
 namespace MyApp1.API.Controllers.UserControllers
 {
-    [Route("api/[controller]")]
+    [Route("api/sessions")]
     [ApiController]
     public class SessionController : ControllerBase
     {
@@ -20,60 +22,76 @@ namespace MyApp1.API.Controllers.UserControllers
             _sessionService = sessionService;
             _mapper = mapper;
         }
-
+        [Authorize(Roles = "Mentor")]
         [HttpPost]
         public async Task<IActionResult> CreateSession([FromBody] CreateSessionDto dto)
         {
-            var id = await _sessionService.CreateSessionAsync(dto);
-            return Ok(ApiResponse<int>.SuccessResponse(id, StatusCodes.Status201Created, "Session created"));
+            int mentorId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var sessionId = await _sessionService.CreateSessionAsync(dto, mentorId);
+            return Ok(ApiResponse<int>.SuccessResponse(sessionId, StatusCodes.Status201Created, "Session created"));
+        }
+        [Authorize(Roles = "Mentor")]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateSession(int id, [FromBody] UpdateSessionDto dto)
+        {
+            var userId= int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var success = await _sessionService.UpdateSessionAsync(id, dto,userId);
+            if (!success)
+                return BadRequest(ApiResponse<string>.FailResponse(StatusCodes.Status400BadRequest, "Failed to update session"));
+
+            return Ok(ApiResponse<string>.SuccessResponse("Session updated successfully", StatusCodes.Status200OK, "Updated"));
+        }
+        [Authorize(Roles = "Mentor")]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteSession(int id)
+        {
+            var userId= int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var success = await _sessionService.DeleteSessionAsync(id, userId);
+            if (!success)
+                return BadRequest(ApiResponse<string>.FailResponse(StatusCodes.Status400BadRequest, "Failed to delete session"));
+
+            return Ok(ApiResponse<string>.SuccessResponse("Session deleted successfully", StatusCodes.Status200OK, "Deleted"));
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetSessionById(int id)
+        public async Task<IActionResult> GetSession(int id)
         {
             var session = await _sessionService.GetSessionByIdAsync(id);
             if (session == null)
                 return NotFound(ApiResponse<string>.FailResponse(StatusCodes.Status404NotFound, "Session not found"));
 
             var dto = _mapper.Map<SessionDto>(session);
-            return Ok(ApiResponse<SessionDto>.SuccessResponse(dto, StatusCodes.Status200OK, "Session details"));
-        }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateSession(int id, [FromBody] UpdateSessionDto dto)
-        {
-            var success = await _sessionService.UpdateSessionAsync(id, dto);
-            if (!success)
-                return BadRequest(ApiResponse<string>.FailResponse(StatusCodes.Status400BadRequest, "Update failed"));
-            return Ok(ApiResponse<string>.SuccessResponse("Updated successfully", StatusCodes.Status200OK, "Session updated"));
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSession(int id)
-        {
-            var success = await _sessionService.DeleteSessionAsync(id);
-            if (!success)
-                return BadRequest(ApiResponse<string>.FailResponse(StatusCodes.Status400BadRequest, "Delete failed"));
-            return Ok(ApiResponse<string>.SuccessResponse("Deleted", StatusCodes.Status200OK, "Session deleted"));
+            return Ok(ApiResponse<SessionDto>.SuccessResponse(dto, StatusCodes.Status200OK, "Session info retrieved"));
         }
 
         [HttpGet("user/{userId}")]
         public async Task<IActionResult> GetUserSessions(int userId, [FromQuery] string role)
         {
-            var sessions = await _sessionService.GetUserSessionsAsync(userId, role);
-            var result = _mapper.Map<IEnumerable<SessionDto>>(sessions);
-            return Ok(ApiResponse<IEnumerable<SessionDto>>.SuccessResponse(result, StatusCodes.Status200OK, "User sessions fetched"));
+            var sessions = await _sessionService.GetSessionsForUserAsync(userId, role);
+            var dto = _mapper.Map<IEnumerable<SessionDto>>(sessions);
+            return Ok(ApiResponse<IEnumerable<SessionDto>>.SuccessResponse(dto, StatusCodes.Status200OK, "User sessions fetched"));
+        }
+        [HttpGet("me")]
+        public async Task<IActionResult> GetMySessions()
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var role = User.FindFirst(ClaimTypes.Role)?.Value ?? "";
+
+            var sessions = await _sessionService.GetSessionsForUserAsync(userId, role);
+            var dto = _mapper.Map<IEnumerable<SessionDto>>(sessions);
+
+            return Ok(ApiResponse<IEnumerable<SessionDto>>.SuccessResponse(dto, StatusCodes.Status200OK, "Sessions fetched"));
         }
 
         [HttpPost("{id}/complete")]
-        public async Task<IActionResult> MarkSessionCompleted(int id)
+        public async Task<IActionResult> CompleteSession(int id)
         {
             var success = await _sessionService.MarkSessionCompletedAsync(id);
             if (!success)
-                return BadRequest(ApiResponse<string>.FailResponse(StatusCodes.Status400BadRequest, "Mark complete failed"));
-            return Ok(ApiResponse<string>.SuccessResponse("Session marked completed", StatusCodes.Status200OK, "Marked completed"));
+                return BadRequest(ApiResponse<string>.FailResponse(StatusCodes.Status400BadRequest, "Failed to mark session completed"));
+
+            return Ok(ApiResponse<string>.SuccessResponse("Session marked completed", StatusCodes.Status200OK, "Completed"));
         }
-
-
     }
+
 }

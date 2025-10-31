@@ -10,13 +10,13 @@ namespace MyApp1.Application.Interfaces.Services
 {
     public interface ISessionService
     {
-        Task<int> CreateSessionAsync(CreateSessionDto dto);
-        Task<Session?> GetSessionByIdAsync(int id);
-        Task<bool> UpdateSessionAsync(int id, UpdateSessionDto dto);
-        Task<bool> DeleteSessionAsync(int id);
-        Task<IEnumerable<Session>> GetUserSessionsAsync(int userId, string role);
-        Task<bool> MarkSessionCompletedAsync(int id);
-        Task<IEnumerable<Session>> GetAllSessionsAsync();
+        Task<int> CreateSessionAsync(CreateSessionDto dto, int mentorId);
+        Task<bool> UpdateSessionAsync(int sessionId, UpdateSessionDto dto,int userId);
+        Task<bool> DeleteSessionAsync(int sessionId, int userId);
+        Task<Session?> GetSessionByIdAsync(int sessionId);
+        Task<IEnumerable<Session>> GetSessionsForUserAsync(int userId, string role);
+        Task<bool> MarkSessionCompletedAsync(int sessionId);
     }
+
 
 }

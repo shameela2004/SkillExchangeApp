@@ -11,6 +11,7 @@ namespace MyApp1.Application.Interfaces.Services
     public interface IUserSkillService
     {
         Task<IEnumerable<UserSkill>> GetUserSkillsAsync(int userId);
+        Task<IEnumerable<SkillDto>> GetTeachingSkillsForUserAsync(int userId);
         Task<bool> AddUserSkillAsync(int userId, AddUserSkillDto dto);
         Task<bool> RemoveUserSkillAsync(int userId, int skillId);
     }

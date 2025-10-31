@@ -6,6 +6,7 @@ using MyApp1.Application.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,7 +20,7 @@ namespace MyApp1.Application.DependencyInjection
             services.AddScoped<SocialTextParser>();
 
             // Register AutoMapper profiles from Application assembly if you keep maps here
-            services.AddAutoMapper(typeof(MappingProfile));
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
             return services;
         }
     }

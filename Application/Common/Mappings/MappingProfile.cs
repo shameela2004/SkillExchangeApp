@@ -1,5 +1,8 @@
 ﻿using AutoMapper;
+using MyApp1.Application.DTOs.Booking;
 using MyApp1.Application.DTOs.Connection;
+using MyApp1.Application.DTOs.Group;
+using MyApp1.Application.DTOs.GroupSession;
 using MyApp1.Application.DTOs.Language;
 using MyApp1.Application.DTOs.Notification;
 using MyApp1.Application.DTOs.Post;
@@ -21,7 +24,8 @@ namespace MyApp1.Application.Common.Mappings
         public MappingProfile() {
             CreateMap<User, UserDto>()
            .ForMember(dest => dest.Skills, opt => opt.MapFrom(src => src.UserSkills))
-            .ForMember(dest => dest.Languages, opt => opt.MapFrom(src => src.UserLanguages));
+            .ForMember(dest => dest.Languages, opt => opt.MapFrom(src => src.UserLanguages))
+            .ForMember(dest => dest.Badges, opt => opt.MapFrom(src => src.UserBadges));
             CreateMap<UserSkill, UserSkillDto>()
                 .ForMember(dest => dest.SkillName, opt => opt.MapFrom(src => src.Skill.Name));
 
@@ -38,22 +42,7 @@ namespace MyApp1.Application.Common.Mappings
     .ForMember(dest => dest.SkillName, opt => opt.MapFrom(src => src.Skill != null ? src.Skill.Name : null))
     .ForMember(dest => dest.EarnedAt, opt => opt.MapFrom(src => src.CreatedAt));
 
-            CreateMap<Session, SessionDto>()
-    .ForMember(dest => dest.SessionId, opt => opt.MapFrom(src => src.Id))
-    .ForMember(dest => dest.Title, opt => opt.MapFrom(src => $"{src.Skill.Name} session"))
-    .ForMember(dest => dest.StartTime, opt => opt.MapFrom(src => src.ScheduledAt))
-    .ForMember(dest => dest.EndTime, opt => opt.MapFrom(src => src.ScheduledAt.AddHours(1)))  // assuming 1 hr sessions
-    .ForMember(dest => dest.Role, opt => opt.MapFrom((src, dest, destMember, context) =>
-    {
-        var userId = (int)context.Items["UserId"];
-        if (src.MentorId == userId)
-            return "Mentor";
-        if (src.Bookings != null && src.Bookings.Any(b => b.LearnerId == userId))
-            return "Learner";
-        return "Unknown";
-    }))
-    .ForMember(dest => dest.Status, opt => opt.MapFrom(src => "Scheduled")); // map this properly if you have status field
-
+          
 
             CreateMap<Notification, NotificationDto>();
 
@@ -63,6 +52,7 @@ namespace MyApp1.Application.Common.Mappings
     .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.ConnectedUser.Name))
     .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
     .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt));
+
 
             CreateMap<Post, PostDto>()
     .ForMember(dest => dest.PostId, opt => opt.MapFrom(src => src.Id))
@@ -99,6 +89,20 @@ namespace MyApp1.Application.Common.Mappings
                 .ForMember(dest => dest.SkillName, opt => opt.MapFrom(src => src.Skill.Name));
             CreateMap<AddUserSkillDto, UserSkill>();
 
+            // Session Mappings
+            CreateMap<Session, SessionDto>();
+            CreateMap<CreateSessionDto, Session>();
+            CreateMap<UpdateSessionDto, Session>();
+
+            // Group Session
+            CreateMap<CreateGroupSessionDto, GroupSession>();
+            CreateMap<GroupSession, GroupSessionDto>();
+
+            // Booking
+            CreateMap<BookSessionDto, Booking>();
+            CreateMap<Booking, BookingDto>();
+
+          
         }
     }
 }

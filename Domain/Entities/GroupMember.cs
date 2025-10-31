@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MyApp1.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,5 +13,6 @@ namespace MyApp1.Domain.Entities
         public Group Group { get; set; } = null!;
         public int UserId { get; set; }
         public User User { get; set; } = null!;
+        public GroupRole Role { get; set; } = GroupRole.Member;  
     }
 }

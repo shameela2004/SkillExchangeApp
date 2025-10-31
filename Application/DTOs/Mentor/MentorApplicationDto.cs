@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyApp1.Application.DTOs.User
+namespace MyApp1.Application.DTOs.Mentor
 {
     public class MentorApplicationDto
     {

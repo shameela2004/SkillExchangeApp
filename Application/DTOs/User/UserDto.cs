@@ -1,4 +1,5 @@
 ﻿using MyApp1.Application.DTOs.Language;
+using MyApp1.Application.DTOs.Mentor;
 using MyApp1.Application.DTOs.Skill;
 using System;
 using System.Collections.Generic;
@@ -17,5 +18,7 @@ namespace MyApp1.Application.DTOs.User
         public string? ProfilePictureUrl { get; set; }
         public ICollection<UserSkillDto>? Skills { get; set; }
         public ICollection<UserLanguageDto>? Languages { get; set; }
+        public ICollection<UserBadgeDto>? Badges { get; set; }
+        public ICollection<MentorAvailabilityDto>? MentorAvailabilities { get; set; }
     }
 }

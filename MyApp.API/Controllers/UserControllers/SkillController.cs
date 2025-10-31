@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyApp1.Application.Common;
@@ -32,9 +33,10 @@ namespace MyApp1.API.Controllers.UserControllers
             return Ok(ApiResponse<IEnumerable<SkillResponseDto>>.SuccessResponse(skillDtos, StatusCodes.Status200OK, "Skills fetched successfully"));
         }
 
-        [HttpGet("user/{userId}")]
-        public async Task<IActionResult> GetUserSkills(int userId)
+        [HttpGet("user")]
+        public async Task<IActionResult> GetUserSkills()
         {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
             var userSkills = await _userSkillService.GetUserSkillsAsync(userId);
             var userSkillDtos = _mapper.Map<IEnumerable<UserSkillResponseDto>>(userSkills);
             return Ok(ApiResponse<IEnumerable<UserSkillResponseDto>>.SuccessResponse(userSkillDtos, StatusCodes.Status200OK, "User skills fetched"));
@@ -49,7 +51,14 @@ namespace MyApp1.API.Controllers.UserControllers
                 return BadRequest(ApiResponse<string>.FailResponse(StatusCodes.Status400BadRequest, "Failed to add skill"));
             return Ok(ApiResponse<string>.SuccessResponse(null, StatusCodes.Status200OK, "Skill added successfully"));
         }
-
+        [Authorize]
+        [HttpGet("my/teaching-skills")]
+        public async Task<IActionResult> GetMyTeachingSkills()
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var skills = await _userSkillService.GetTeachingSkillsForUserAsync(userId);
+            return Ok(ApiResponse<IEnumerable<SkillDto>>.SuccessResponse(skills, StatusCodes.Status200OK, "Teaching skills fetched"));
+        }
         [HttpDelete("user/{skillId}")]
         public async Task<IActionResult> RemoveUserSkill(int skillId)
         {

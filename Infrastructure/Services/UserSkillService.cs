@@ -33,6 +33,20 @@ namespace MyApp1.Infrastructure.Services
                 .Include(us => us.Skill)
                 .ToListAsync();
         }
+        public async Task<IEnumerable<SkillDto>> GetTeachingSkillsForUserAsync(int userId)
+        {
+            var skills = await _userSkillRepository.Table
+                .Include(us => us.Skill)
+                .Where(us => us.UserId == userId && us.Type=="Teaching")
+                .Select(us => new SkillDto
+                {
+                    Id = us.SkillId,
+                    Name = us.Skill.Name
+                }).ToListAsync();
+
+            return skills;
+        }
+
 
         public async Task<bool> AddUserSkillAsync(int userId, AddUserSkillDto dto)
         {
