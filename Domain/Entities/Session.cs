@@ -15,10 +15,8 @@ namespace MyApp1.Domain.Entities
         public int SkillId { get; set; }
         public Skill Skill { get; set; } = null!;
 
-        public int? GroupId { get; set; }
-        public Group? Group { get; set; }
-
-        public string Type { get; set; } = string.Empty; // Individual / Group
+        //public int? GroupId { get; set; }
+        //public Group? Group { get; set; }
         public DateTime ScheduledAt { get; set; }
         public string Mode { get; set; } = string.Empty; // Online / Offline
         public string? Notes { get; set; }

@@ -25,7 +25,6 @@ namespace MyApp1.Application.DTOs.Session
         public int SkillId { get; set; }
         public DateTime ScheduledAt { get; set; }
         public string Mode { get; set; } = string.Empty;
-        public string Type { get; set; } = string.Empty;
         public int? MaxParticipants { get; set; }
         public string? Notes { get; set; }
         public decimal? Price { get; set; }

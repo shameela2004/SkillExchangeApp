@@ -70,7 +70,6 @@ namespace MyApp1.Infrastructure.Services
                 SkillId = dto.SkillId,
                 ScheduledAt = dto.ScheduledAt,
                 Mode = dto.Mode,
-                Type = dto.Type,
                 Notes = dto.Notes,
                 Price = dto.Price ?? 0,
             };

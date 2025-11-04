@@ -136,7 +136,11 @@ namespace MyApp1.Infrastructure.Data
                 .WithMany(s => s.Bookings)
                 .HasForeignKey(b => b.SessionId)
                 .OnDelete(DeleteBehavior.Cascade);
-
+            modelBuilder.Entity<Booking>()
+    .HasOne(b => b.GroupSession)
+    .WithMany(gs => gs.Bookings)
+    .HasForeignKey(b => b.GroupSessionId)
+    .OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<Booking>()
                 .HasOne(b => b.Learner)
                 .WithMany(u => u.Bookings)
@@ -433,6 +437,12 @@ namespace MyApp1.Infrastructure.Data
       .WithMany(mp => mp.Availabilities)
       .HasForeignKey(ma => ma.MentorProfileId)
       .OnDelete(DeleteBehavior.Cascade);
+
+
+
+
+
+
         }
     }
     

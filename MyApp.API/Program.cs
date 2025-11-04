@@ -1,6 +1,7 @@
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MyApp1.API.Extensions;
@@ -11,6 +12,7 @@ using MyApp1.Application.Services;
 using MyApp1.Domain.Interfaces;
 using MyApp1.Infrastructure.Data;
 using MyApp1.Infrastructure.DependencyInjection;
+using MyApp1.Infrastructure.Helpers;
 using MyApp1.Infrastructure.Repositories;
 using MyApp1.Infrastructure.Seeders;
 using System.Text;
@@ -24,6 +26,13 @@ namespace MyApp.API
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddControllers();
+            builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+        options.JsonSerializerOptions.MaxDepth = 64;  // Adjust as per your needs
+    });
+
 
             //// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -87,7 +96,6 @@ namespace MyApp.API
 
             builder.Services.AddApplicationServices();
             builder.Services.AddInfrastructureServices(builder.Configuration);
-
 
             var app = builder.Build();
 

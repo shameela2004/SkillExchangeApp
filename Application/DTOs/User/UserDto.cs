@@ -19,6 +19,7 @@ namespace MyApp1.Application.DTOs.User
         public ICollection<UserSkillDto>? Skills { get; set; }
         public ICollection<UserLanguageDto>? Languages { get; set; }
         public ICollection<UserBadgeDto>? Badges { get; set; }
-        public ICollection<MentorAvailabilityDto>? MentorAvailabilities { get; set; }
+
+        public List<MentorAvailabilityDto>? MentorAvailabilities { get; set; }
     }
 }

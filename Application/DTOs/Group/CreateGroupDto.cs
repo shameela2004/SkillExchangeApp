@@ -10,7 +10,7 @@ namespace MyApp1.Application.DTOs.Group
     {
         public string Name { get; set; } = string.Empty;
         public int SkillId { get; set; }
-        public int MentorId { get; set; }
         public int MaxMembers { get; set; }
     }
+
 }

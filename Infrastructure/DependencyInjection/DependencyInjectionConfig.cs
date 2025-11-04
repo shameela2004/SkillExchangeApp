@@ -8,6 +8,8 @@ using MyApp1.Application.Services;
 using MyApp1.Domain.Entities;
 using MyApp1.Domain.Interfaces;
 using MyApp1.Infrastructure.Data;
+using MyApp1.Infrastructure.Helpers;
+using MyApp1.Infrastructure.RazorPay;
 using MyApp1.Infrastructure.Repositories;
 using MyApp1.Infrastructure.Services;
 using System;
@@ -26,6 +28,10 @@ namespace MyApp1.Infrastructure.DependencyInjection
             options.UseSqlServer(
                 configuration.GetConnectionString("DefaultConnection"),
                 b => b.MigrationsAssembly("MyApp1.Infrastructure")));
+
+            services.Configure<RazorpaySettings>(configuration.GetSection("RazorpaySettings"));
+            services.AddScoped<RazorpayService>();
+
 
             // Registering Repositories
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
@@ -49,6 +55,8 @@ namespace MyApp1.Infrastructure.DependencyInjection
             services.AddScoped<IBookingService, BookingService>();
             services.AddScoped<IGroupSessionService, GroupSessionService>();
             services.AddScoped<IGroupService, GroupService>();
+            services.AddScoped<IRatingService, RatingService>();
+            services.AddScoped<IUserReportService, UserReportService>();
 
 
 

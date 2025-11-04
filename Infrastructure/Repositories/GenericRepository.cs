@@ -24,7 +24,7 @@ namespace MyApp1.Infrastructure.Repositories
 
         public async Task<T?> GetByIdAsync(int id)
         {
-            return await _dbSet.FindAsync(id);
+            return await _dbSet.FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
         }
 
         public async Task<IEnumerable<T>> GetAllAsync()

@@ -8,9 +8,12 @@ namespace MyApp1.Domain.Entities
 {
     public class Booking : BaseEntity
     {
-        public int SessionId { get; set; }
-        public Session Session { get; set; } = null!;
+      
+        public int? SessionId { get; set; }
+        public Session? Session { get; set; }
 
+        public int? GroupSessionId { get; set; }
+        public GroupSession? GroupSession { get; set; }
         public int LearnerId { get; set; }
         public User Learner { get; set; } = null!;
 

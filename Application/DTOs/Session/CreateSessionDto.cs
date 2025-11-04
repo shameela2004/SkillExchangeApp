@@ -11,7 +11,6 @@ namespace MyApp1.Application.DTOs.Session
         public int SkillId { get; set; }
         public DateTime ScheduledAt { get; set; }
         public string Mode { get; set; } = string.Empty; // Online / Offline
-        public string Type { get; set; } = string.Empty; // Individual / Group
         public string? Notes { get; set; }
         public decimal? Price { get; set; }
     }

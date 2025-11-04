@@ -16,7 +16,11 @@ namespace MyApp1.Application.Common.Mappings
             CreateMap<Group, GroupDto>();
             CreateMap<CreateGroupDto, Group>();
 
-            CreateMap<GroupMember, GroupMemberDto>().ReverseMap();
+            CreateMap<GroupMember, AddGroupMemberDto>().ReverseMap();
+            CreateMap<GroupMember, GroupMemberDto>()
+    .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.Name))
+    .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.ToString()));
+
 
             CreateMap<GroupMessage, GroupMessageDto>().ReverseMap();
             CreateMap<SendGroupMessageDto, GroupMessage>();

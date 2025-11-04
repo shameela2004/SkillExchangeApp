@@ -5,6 +5,7 @@ using MyApp1.Application.Common;
 using MyApp1.Application.DTOs.GroupSession;
 using MyApp1.Application.Interfaces.Services;
 using MyApp1.Domain.Entities;
+using System.Security.Claims;
 
 namespace MyApp1.API.Controllers.AdminControllers
 {
@@ -44,7 +45,8 @@ namespace MyApp1.API.Controllers.AdminControllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGroupSession(int id)
         {
-            var success = await _groupSessionService.DeleteGroupSessionAsync(id);
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var success = await _groupSessionService.DeleteSessionByAdminAsync(id, userId);
             if (!success)
                 return BadRequest(ApiResponse<string>.FailResponse(StatusCodes.Status400BadRequest, "Delete failed"));
             return Ok(ApiResponse<string>.SuccessResponse("Deleted successfully", StatusCodes.Status200OK, "Group session deleted"));

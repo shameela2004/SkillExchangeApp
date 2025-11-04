@@ -25,7 +25,8 @@ namespace MyApp1.Application.Common.Mappings
             CreateMap<User, UserDto>()
            .ForMember(dest => dest.Skills, opt => opt.MapFrom(src => src.UserSkills))
             .ForMember(dest => dest.Languages, opt => opt.MapFrom(src => src.UserLanguages))
-            .ForMember(dest => dest.Badges, opt => opt.MapFrom(src => src.UserBadges));
+            .ForMember(dest => dest.Badges, opt => opt.MapFrom(src => src.UserBadges))
+    .ForMember(dest => dest.MentorAvailabilities, opt => opt.MapFrom(src => src.MentorProfile != null ? src.MentorProfile.Availabilities.Where(a => !a.IsDeleted) : null));
             CreateMap<UserSkill, UserSkillDto>()
                 .ForMember(dest => dest.SkillName, opt => opt.MapFrom(src => src.Skill.Name));
 
@@ -93,10 +94,6 @@ namespace MyApp1.Application.Common.Mappings
             CreateMap<Session, SessionDto>();
             CreateMap<CreateSessionDto, Session>();
             CreateMap<UpdateSessionDto, Session>();
-
-            // Group Session
-            CreateMap<CreateGroupSessionDto, GroupSession>();
-            CreateMap<GroupSession, GroupSessionDto>();
 
             // Booking
             CreateMap<BookSessionDto, Booking>();

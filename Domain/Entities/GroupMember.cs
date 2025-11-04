@@ -13,6 +13,6 @@ namespace MyApp1.Domain.Entities
         public Group Group { get; set; } = null!;
         public int UserId { get; set; }
         public User User { get; set; } = null!;
-        public GroupRole Role { get; set; } = GroupRole.Member;  
+        public string Role { get; set; } = "Member";  
     }
 }

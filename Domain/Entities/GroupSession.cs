@@ -13,5 +13,10 @@ namespace MyApp1.Domain.Entities
         public DateTime ScheduledAt { get; set; }
         public string Mode { get; set; } = string.Empty; // Online / Offline
         public string? Notes { get; set; }
+        public string? VideoLink { get; set; }
+        public decimal? Price { get; set; }
+        public bool IsCompleted { get; set; } = false;
+        public ICollection<Booking>? Bookings { get; set; }
+
     }
 }

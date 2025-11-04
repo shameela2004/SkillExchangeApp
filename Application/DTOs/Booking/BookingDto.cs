@@ -9,7 +9,8 @@ namespace MyApp1.Application.DTOs.Booking
     public class BookingDto
     {
         public int Id { get; set; }
-        public int SessionId { get; set; }
+        public int? SessionId { get; set; }
+        public int? GroupSessionId { get; set; }
         public int LearnerId { get; set; }
         public string Status { get; set; } = string.Empty;
         public decimal PaymentAmount { get; set; }

@@ -86,6 +86,9 @@ namespace MyApp1.Infrastructure.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("GroupSessionId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -120,7 +123,7 @@ namespace MyApp1.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("SessionId")
+                    b.Property<int?>("SessionId")
                         .HasColumnType("int");
 
                     b.Property<string>("Status")
@@ -128,6 +131,8 @@ namespace MyApp1.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GroupSessionId");
 
                     b.HasIndex("LearnerId");
 
@@ -268,8 +273,9 @@ namespace MyApp1.Infrastructure.Migrations
                     b.Property<int?>("LastUpdatedBy")
                         .HasColumnType("int");
 
-                    b.Property<int>("Role")
-                        .HasColumnType("int");
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -354,6 +360,9 @@ namespace MyApp1.Infrastructure.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -373,8 +382,14 @@ namespace MyApp1.Infrastructure.Migrations
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal?>("Price")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<DateTime>("ScheduledAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("VideoLink")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -1113,9 +1128,6 @@ namespace MyApp1.Infrastructure.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("GroupId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -1156,16 +1168,10 @@ namespace MyApp1.Infrastructure.Migrations
                     b.Property<int>("SkillId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("VideoLink")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("GroupId");
 
                     b.HasIndex("MentorId");
 
@@ -1584,6 +1590,11 @@ namespace MyApp1.Infrastructure.Migrations
 
             modelBuilder.Entity("MyApp1.Domain.Entities.Booking", b =>
                 {
+                    b.HasOne("MyApp1.Domain.Entities.GroupSession", "GroupSession")
+                        .WithMany("Bookings")
+                        .HasForeignKey("GroupSessionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("MyApp1.Domain.Entities.User", "Learner")
                         .WithMany("Bookings")
                         .HasForeignKey("LearnerId")
@@ -1593,8 +1604,9 @@ namespace MyApp1.Infrastructure.Migrations
                     b.HasOne("MyApp1.Domain.Entities.Session", "Session")
                         .WithMany("Bookings")
                         .HasForeignKey("SessionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("GroupSession");
 
                     b.Navigation("Learner");
 
@@ -1909,10 +1921,6 @@ namespace MyApp1.Infrastructure.Migrations
 
             modelBuilder.Entity("MyApp1.Domain.Entities.Session", b =>
                 {
-                    b.HasOne("MyApp1.Domain.Entities.Group", "Group")
-                        .WithMany()
-                        .HasForeignKey("GroupId");
-
                     b.HasOne("MyApp1.Domain.Entities.User", "Mentor")
                         .WithMany("SessionsAsMentor")
                         .HasForeignKey("MentorId")
@@ -1924,8 +1932,6 @@ namespace MyApp1.Infrastructure.Migrations
                         .HasForeignKey("SkillId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Group");
 
                     b.Navigation("Mentor");
 
@@ -2051,6 +2057,11 @@ namespace MyApp1.Infrastructure.Migrations
                     b.Navigation("GroupSessions");
 
                     b.Navigation("Members");
+                });
+
+            modelBuilder.Entity("MyApp1.Domain.Entities.GroupSession", b =>
+                {
+                    b.Navigation("Bookings");
                 });
 
             modelBuilder.Entity("MyApp1.Domain.Entities.Language", b =>
