@@ -12,6 +12,7 @@ namespace MyApp1.API.Controllers.UserControllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class SkillController : ControllerBase
     {
         private readonly IGenericService<Skill> _genericSkillService;
@@ -42,7 +43,7 @@ namespace MyApp1.API.Controllers.UserControllers
             return Ok(ApiResponse<IEnumerable<UserSkillResponseDto>>.SuccessResponse(userSkillDtos, StatusCodes.Status200OK, "User skills fetched"));
         }
 
-        [HttpPost("user/")]
+        [HttpPost("user")]
         public async Task<IActionResult> AddUserSkill([FromBody] AddUserSkillDto addDto)
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");

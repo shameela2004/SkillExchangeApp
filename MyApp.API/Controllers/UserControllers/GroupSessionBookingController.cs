@@ -26,8 +26,8 @@ namespace MyApp1.API.Controllers.UserControllers
         public async Task<IActionResult> BookGroupSession([FromBody] BookSessionDto dto)
         {
             var learnerId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-            var bookingId = await _bookingService.BookGroupSessionAsync(dto, learnerId);
-            return Ok(ApiResponse<int>.SuccessResponse(bookingId, StatusCodes.Status201Created, "Group session booked"));
+            var response = await _bookingService.BookGroupSessionAsync(dto, learnerId);
+            return Ok(ApiResponse<BookingResponseDto>.SuccessResponse(response, StatusCodes.Status201Created, "Group session booked"));
         }
     }
 }

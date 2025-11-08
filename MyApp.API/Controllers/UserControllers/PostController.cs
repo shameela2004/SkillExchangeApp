@@ -35,6 +35,7 @@ namespace MyApp1.API.Controllers.UserControllers
             var postsDto = _mapper.Map<IEnumerable<PostDto>>(posts);
             return Ok(ApiResponse<IEnumerable<PostDto>>.SuccessResponse(postsDto, StatusCodes.Status200OK, "Posts fetched successfully"));
         }
+        
 
         [HttpPost]
         public async Task<IActionResult> CreatePost([FromBody] CreatePostDto createDto)

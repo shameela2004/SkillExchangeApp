@@ -29,7 +29,7 @@ namespace MyApp1.Infrastructure.Services
         public async Task<IEnumerable<UserSkill>> GetUserSkillsAsync(int userId)
         {
             return await _userSkillRepository.Table
-                .Where(us => us.UserId == userId && !us.IsDeleted)
+                .Where(us => us.UserId == userId && !us.IsDeleted && us.Type=="Learning")
                 .Include(us => us.Skill)
                 .ToListAsync();
         }
@@ -37,7 +37,7 @@ namespace MyApp1.Infrastructure.Services
         {
             var skills = await _userSkillRepository.Table
                 .Include(us => us.Skill)
-                .Where(us => us.UserId == userId && us.Type=="Teaching")
+                .Where(us => us.UserId == userId && us.Type=="Teaching" && !us.IsDeleted )
                 .Select(us => new SkillDto
                 {
                     Id = us.SkillId,

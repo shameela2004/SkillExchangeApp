@@ -60,7 +60,25 @@ namespace MyApp1.Infrastructure.Services
         {
             return await _postRepository.GetByIdAsync(postId);
         }
-
+        public async Task <PostDto?> GetPostDtoByIdAsync(int postId)
+        {
+            var post = await _postRepository.Table
+                .Include(p => p.User)
+                .FirstOrDefaultAsync(p => p.Id == postId);
+            if (post == null) return null;
+            var postDto = new PostDto
+            {
+                PostId = post.Id,
+                UserId = post.UserId,
+                UserName = post.User.Name,
+                Content = post.Content,
+                MediaUrl = post.MediaUrl,
+                CreatedAt = post.CreatedAt,
+                LikeCount = post.LikeCount,
+                CommentCount = post.CommentCount
+            };
+            return postDto;
+        }
         public async Task<bool> CreatePostAsync(int userId, CreatePostDto createDto)
         {
             var post = new Post

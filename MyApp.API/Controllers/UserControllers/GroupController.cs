@@ -12,6 +12,7 @@ namespace MyApp1.API.Controllers.UserControllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class GroupController : ControllerBase
     {
         private readonly IGroupService _groupService;
@@ -23,6 +24,14 @@ namespace MyApp1.API.Controllers.UserControllers
             _mapper = mapper;
         }
 
+        [HttpGet("my-groups")]
+        public async Task<IActionResult> GetMyGroups()
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var groups = await _groupService.GetMyGroups(userId);
+            var groupDtos = _mapper.Map<IEnumerable<GroupDto>>(groups);
+            return Ok(ApiResponse<IEnumerable<GroupDto>>.SuccessResponse(groupDtos, StatusCodes.Status200OK, "Groups fetched"));
+        }
         [HttpPost]
         [Authorize(Roles = "Mentor")]
         public async Task<IActionResult> CreateGroup([FromBody] CreateGroupDto dto)

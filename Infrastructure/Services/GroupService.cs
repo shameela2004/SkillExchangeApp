@@ -31,7 +31,16 @@ namespace MyApp1.Infrastructure.Services
             _groupMessageRepo = groupMessageRepo;
             _mapper = mapper;
         }
-
+        public async Task<IEnumerable<Group>> GetMyGroups(int userId)
+        {
+            var memberGroupIds = await _groupMemberRepo.Table
+                .Where(m => m.UserId == userId && !m.IsDeleted)
+                .Select(m => m.GroupId)
+                .ToListAsync();
+            return await _groupRepo.Table
+                .Where(g => memberGroupIds.Contains(g.Id) && !g.IsDeleted)
+                .ToListAsync();
+        }
         public async Task<int> CreateGroupAsync(CreateGroupDto dto, int mentorId)
         {
             var group = new Group
@@ -56,7 +65,6 @@ namespace MyApp1.Infrastructure.Services
             await _groupMemberRepo.SaveChangesAsync();
             return group.Id;
         }
-
 
         public async Task<bool> DeleteGroupAsync(int groupId, int userId)
         {

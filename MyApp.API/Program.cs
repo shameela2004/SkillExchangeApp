@@ -91,13 +91,39 @@ namespace MyApp.API
                     IssuerSigningKey = new SymmetricSecurityKey(secretKey),
                     ClockSkew = TimeSpan.Zero
                 };
+               
+                // Extract token from cookie instead of Authorization header
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Cookies["accessToken"];
+                        if (!string.IsNullOrEmpty(accessToken))
+                        {
+                            context.Token = accessToken;
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
             });
 
 
             builder.Services.AddApplicationServices();
             builder.Services.AddInfrastructureServices(builder.Configuration);
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowOrigin", builder =>
+                {
+                    builder.WithOrigins("http://localhost:5173")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                });
+            });
+
             var app = builder.Build();
+
 
             app.UseGlobalExceptionHandler();
             using (var scope = app.Services.CreateScope())
@@ -112,9 +138,10 @@ namespace MyApp.API
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
+            app.UseCors("AllowOrigin");
             app.UseHttpsRedirection();
-
+           
+            app.UseAuthentication();
             app.UseAuthorization();
 
 

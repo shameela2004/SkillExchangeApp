@@ -64,10 +64,7 @@ public class UserController : ControllerBase
         var user = await _userGenericService.GetByIdAsync(userId);
         if (user == null)
             return NotFound(ApiResponse<string>.FailResponse(StatusCodes.Status404NotFound, "User not found"));
-
-        _mapper.Map(updateDto, user);
-
-        var success = await _userService.UpdateUserAsync(user);
+        var success = await _userService.UpdateUserAsync(userId,updateDto);
         if (!success)
             return BadRequest(ApiResponse<string>.FailResponse(StatusCodes.Status400BadRequest, "Failed to update profile"));
 

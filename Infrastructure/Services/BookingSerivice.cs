@@ -93,9 +93,12 @@ namespace MyApp1.Infrastructure.Services
             return booking.Id;
         }
 
-        public async Task<int> BookGroupSessionAsync(BookSessionDto dto, int learnerId)
+        public async Task<BookingResponseDto> BookGroupSessionAsync(BookSessionDto dto, int learnerId)
         {
-            var groupSession = await _groupSessionRepo.GetByIdAsync(dto.SessionId);
+            //var groupSession = await _groupSessionRepo.GetByIdAsync(dto.SessionId);
+            var groupSession = await _groupSessionRepo.Table
+     .Include(gs => gs.Group) // Eagerly load Group navigation property
+     .FirstOrDefaultAsync(gs => gs.Id == dto.SessionId);
             if (groupSession == null)
                 throw new Exception("Group session not found");
 
@@ -156,8 +159,16 @@ namespace MyApp1.Infrastructure.Services
                 booking.PaymentStatus = "Free";
                 await _bookingRepo.UpdateAsync(booking);
             }
+            var getPayment = await _paymentRepo.GetByIdAsync(booking.PaymentId.GetValueOrDefault());
 
-            return booking.Id;
+            var response = new BookingResponseDto
+            {
+                BookingId = booking.Id,
+                PaymentId = getPayment?.Id ?? 0,
+                RazorpayOrderId = getPayment?.RazorpayOrderId ?? string.Empty
+            };
+
+            return response;
         }
 
 

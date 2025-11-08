@@ -36,13 +36,27 @@ namespace MyApp1.Infrastructure.Services
                     .ThenInclude(ul => ul.Language)
                     .Include(u => u.MentorProfile)
             .ThenInclude(mp => mp.Availabilities.Where(a => !a.IsDeleted))
+            .Include(u=>u.Posts)
                 .Include(u => u.UserBadges)
                 .FirstOrDefaultAsync(u => u.Id == id && !u.IsDeleted && u.Role != "Admin");
         }
 
-        public async Task<bool> UpdateUserAsync(User updatedUser)
+        public async Task<User?> GetUserByEmailAsync(string email)
         {
-            var user = await _userRepository.GetByIdAsync(updatedUser.Id);
+            return await _userRepository.Table
+                .Include(u => u.UserSkills.Where(us => !us.IsDeleted))
+                    .ThenInclude(us => us.Skill)
+                 .Include(u => u.UserLanguages.Where(ul => !ul.IsDeleted))
+                    .ThenInclude(ul => ul.Language)
+                    .Include(u => u.MentorProfile)
+            .ThenInclude(mp => mp.Availabilities.Where(a => !a.IsDeleted))
+             .Include(u => u.Posts)
+                .Include(u => u.UserBadges)
+                .FirstOrDefaultAsync(u => u.Email == email && !u.IsDeleted && u.Role != "Admin");
+        }
+        public async Task<bool> UpdateUserAsync(int userId,UpdateUserDto updatedUser)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
             if (user == null || user.IsDeleted)
                 return false;
 

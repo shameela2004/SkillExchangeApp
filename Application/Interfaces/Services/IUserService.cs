@@ -11,7 +11,8 @@ namespace MyApp1.Application.Interfaces.Services
     public interface IUserService
     {
         Task<User?> GetUserByIdAsync(int id);
-        Task<bool> UpdateUserAsync(User user);
+        Task<User?> GetUserByEmailAsync(string email);
+        Task<bool> UpdateUserAsync(int userId,UpdateUserDto updatedUser);
         Task<IEnumerable<UserBadge>> GetUserBadgesAsync(int userId);
         Task<IEnumerable<User>> SearchUsersAsync(SearchUserDto filter);
     }

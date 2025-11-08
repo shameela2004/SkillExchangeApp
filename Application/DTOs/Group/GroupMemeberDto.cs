@@ -10,7 +10,8 @@ namespace MyApp1.Application.DTOs.Group
     {
         public int GroupId { get; set; }
         public int UserId { get; set; }
-        public string UserName { get; set; } = string.Empty; // Basic user info only
+        public string UserName { get; set; } = string.Empty; 
+        public string profilePictureUrl { get; set; } = string.Empty;
         public string Role { get; set; } = string.Empty;     // "Admin" or "Member"
     }
 

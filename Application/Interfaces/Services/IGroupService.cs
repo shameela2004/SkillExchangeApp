@@ -10,6 +10,7 @@ namespace MyApp1.Application.Interfaces.Services
 {
     public interface IGroupService
     {
+        Task<IEnumerable<Group>> GetMyGroups(int userId);
         Task<int> CreateGroupAsync(CreateGroupDto dto, int mentorId);
         Task<Group?> GetGroupByIdAsync(int groupId);
         Task<IEnumerable<Group>> GetGroupsByMentorAsync(int mentorId);
