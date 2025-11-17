@@ -117,7 +117,9 @@ namespace MyApp1.Infrastructure.Services
 
         public async Task<IEnumerable<Session>> GetSessionsForUserAsync(int userId, string role)
         {
-            IQueryable<Session> query = _sessionRepository.Table;
+            IQueryable<Session> query = _sessionRepository.Table
+                .Include(s => s.Skill)
+            .Include(s => s.Mentor);
 
             if (role.ToLower() == "mentor")
             {
@@ -128,6 +130,14 @@ namespace MyApp1.Infrastructure.Services
                 query = query.Where(s => s.Bookings.Any(b => b.LearnerId == userId && !b.IsCancelled));
             }
 
+            return await query.ToListAsync();
+        }
+        public async Task<IEnumerable<Session>> GetSessionsForMentorAsync(int userId)
+        {
+            IQueryable<Session> query = _sessionRepository.Table
+               .Include(s => s.Skill)
+               .Include(s => s.Mentor);
+            query = query.Where(s => s.MentorId == userId);
             return await query.ToListAsync();
         }
 

@@ -15,7 +15,7 @@ namespace MyApp1.Domain.Entities
         public int? SessionId { get; set; }
         public Session? Session { get; set; }
 
-        public string Content { get; set; } = string.Empty;
+        public string? Content { get; set; } = string.Empty;
         public string? VoiceFilePath { get; set; }
         public string? FilePath { get; set; }
     }

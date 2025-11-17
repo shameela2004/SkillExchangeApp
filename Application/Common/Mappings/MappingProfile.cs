@@ -41,7 +41,6 @@ namespace MyApp1.Application.Common.Mappings
          .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
          .ForMember(dest => dest.Bio, opt => opt.MapFrom(src => src.Bio))
          .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location))
-         .ForMember(dest => dest.ProfilePictureUrl, opt => opt.MapFrom(src => src.ProfilePictureUrl))
          .ForAllMembers(opt => opt.Ignore());
 
             CreateMap<UserBadge, UserBadgeDto>()
@@ -98,15 +97,19 @@ namespace MyApp1.Application.Common.Mappings
             CreateMap<AddUserSkillDto, UserSkill>();
 
             // Session Mappings
-            CreateMap<Session, SessionDto>();
+            CreateMap<Session, SessionDto>()
+                .ForMember(dest=> dest.Mentor, opt=> opt.MapFrom(src => src.Mentor.Name))
+                .ForMember(dest=> dest.Skill, opt=> opt.MapFrom(src=>src.Skill.Name));
             CreateMap<CreateSessionDto, Session>();
             CreateMap<UpdateSessionDto, Session>();
 
             // Booking
             CreateMap<BookSessionDto, Booking>();
-            CreateMap<Booking, BookingDto>();
+            CreateMap<Booking, BookingDto>()
+                .ForMember(dest => dest.LearnerName, opt => opt.MapFrom(src => src.Learner.Name));
 
-          
+
+
         }
     }
 }

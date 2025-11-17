@@ -14,7 +14,7 @@ namespace MyApp1.Domain.Entities
         public string Email { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
         public string? Bio { get; set; }
-        public string? ProfilePictureUrl { get; set; } = "/images/default-avatar.png";
+        public string? ProfilePictureUrl { get; set; } = string.Empty;
         public string? Location { get; set; }
         //public bool IsMentor { get; set; } = false;
         public string Role { get; set; } = "Learner";  // Role for authorization

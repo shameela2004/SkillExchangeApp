@@ -11,6 +11,6 @@ namespace MyApp1.Application.DTOs.User
         public string Name { get; set; } = string.Empty;
         public string? Bio { get; set; }
         public string? Location { get; set; }
-        public string? ProfilePictureUrl { get; set; }
+        //public string? ProfilePictureUrl { get; set; }
     }
 }

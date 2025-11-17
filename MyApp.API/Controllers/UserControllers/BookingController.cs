@@ -51,9 +51,9 @@ namespace MyApp1.API.Controllers.UserControllers
         }
 
         [HttpPost("{id}/cancel")]
-        public async Task<IActionResult> CancelBooking(int id, [FromBody] string? reason)
+        public async Task<IActionResult> CancelBooking(int id, [FromBody] CancelBookingDto dto)
         {
-            var success = await _bookingService.CancelBookingAsync(id, reason);
+            var success = await _bookingService.CancelBookingAsync(id, dto.reason);
             if (!success)
                 return BadRequest(ApiResponse<string>.FailResponse(StatusCodes.Status400BadRequest, "Cancellation failed"));
             return Ok(ApiResponse<string>.SuccessResponse("Cancelled", StatusCodes.Status200OK, "Booking cancelled"));
@@ -80,9 +80,9 @@ namespace MyApp1.API.Controllers.UserControllers
 
         [Authorize(Roles = "Mentor")]
         [HttpPost("{bookingId}/reject")]
-        public async Task<IActionResult> RejectBooking(int bookingId, [FromBody] string? reason)
+        public async Task<IActionResult> RejectBooking(int bookingId, [FromBody] CancelBookingDto dto)
         {
-            var success = await _bookingService.RejectBookingAsync(bookingId, reason);
+            var success = await _bookingService.RejectBookingAsync(bookingId, dto.reason);
             if (!success)
                 return BadRequest(ApiResponse<string>.FailResponse(400, "Failed to reject booking"));
             return Ok(ApiResponse<string>.SuccessResponse(null, 200, "Booking rejected"));

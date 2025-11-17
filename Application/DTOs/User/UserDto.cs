@@ -1,4 +1,5 @@
 ﻿using MyApp1.Application.DTOs.Language;
+using MyApp1.Application.DTOs.MediaAsset;
 using MyApp1.Application.DTOs.Mentor;
 using MyApp1.Application.DTOs.Post;
 using MyApp1.Application.DTOs.Skill;
@@ -19,6 +20,7 @@ namespace MyApp1.Application.DTOs.User
         public string? ProfilePictureUrl { get; set; }
         public string Role { get; set; } = string.Empty;
         public string MentorStatus { get; set; } = string.Empty;
+        public MediaAssetDto? ProfilePicture { get; set; }
         public ICollection<PostDto> ? Posts { get; set; }
         public ICollection<UserSkillDto>? Skills { get; set; }
         public ICollection<UserLanguageDto>? Languages { get; set; }

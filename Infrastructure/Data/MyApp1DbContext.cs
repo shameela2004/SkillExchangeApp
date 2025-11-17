@@ -42,6 +42,8 @@ namespace MyApp1.Infrastructure.Data
         public DbSet<MentorAvailability> MentorAvailabilities { get; set; }
         public DbSet<Language> Languages { get; set; }
         public DbSet<UserLanguage> UserLanguages { get; set; }
+        public DbSet<MediaAsset> MediaAssets { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

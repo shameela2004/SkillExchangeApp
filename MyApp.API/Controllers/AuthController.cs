@@ -108,15 +108,15 @@ namespace MyApp1.API.Controllers
             Response.Cookies.Append("accessToken", tokens.Token, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
+                Secure = Request.IsHttps,
+                SameSite = SameSiteMode.None,
                 Expires = DateTimeOffset.Now.AddHours(2)
             });
             Response.Cookies.Append("refreshToken", tokens.RefreshToken, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
+                Secure = Request.IsHttps,
+                SameSite = SameSiteMode.None,
                 Expires = DateTimeOffset.Now.AddDays(7)
             });
             return Ok(ApiResponse<object>.SuccessResponse(new { }, StatusCodes.Status200OK, "Refresh Token Created Successfully"));
@@ -146,14 +146,14 @@ namespace MyApp1.API.Controllers
             Response.Cookies.Delete("accessToken", new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,
+                Secure = Request.IsHttps,
                 SameSite = SameSiteMode.None
             });
 
             Response.Cookies.Delete("refreshToken", new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,
+                Secure = Request.IsHttps,
                 SameSite = SameSiteMode.None
             });
 

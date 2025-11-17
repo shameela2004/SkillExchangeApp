@@ -6,6 +6,8 @@ using MyApp1.Application.DTOs.Group;
 using MyApp1.Application.Interfaces.Services;
 using MyApp1.Domain.Entities;
 using System.Security.Claims;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace MyApp1.API.Controllers.AdminControllers
 {

@@ -57,6 +57,8 @@ namespace MyApp1.Infrastructure.DependencyInjection
             services.AddScoped<IGroupService, GroupService>();
             services.AddScoped<IRatingService, RatingService>();
             services.AddScoped<IUserReportService, UserReportService>();
+            services.AddScoped<IMediaService, MediaService>();
+            services.AddScoped<IMessageService, MessageService>();
 
 
 

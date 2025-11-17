@@ -64,20 +64,20 @@ namespace MyApp1.API.Controllers.UserControllers
             return Ok(ApiResponse<SessionDto>.SuccessResponse(dto, StatusCodes.Status200OK, "Session info retrieved"));
         }
 
-        [HttpGet("user/{userId}")]
-        public async Task<IActionResult> GetUserSessions(int userId, [FromQuery] string role)
-        {
-            var sessions = await _sessionService.GetSessionsForUserAsync(userId, role);
-            var dto = _mapper.Map<IEnumerable<SessionDto>>(sessions);
-            return Ok(ApiResponse<IEnumerable<SessionDto>>.SuccessResponse(dto, StatusCodes.Status200OK, "User sessions fetched"));
-        }
+        //[HttpGet("user/{userId}")]
+        //public async Task<IActionResult> GetUserSessions(int userId, [FromQuery] string role)
+        //{
+        //    var sessions = await _sessionService.GetSessionsForUserAsync(userId, role);
+        //    var dto = _mapper.Map<IEnumerable<SessionDto>>(sessions);
+        //    return Ok(ApiResponse<IEnumerable<SessionDto>>.SuccessResponse(dto, StatusCodes.Status200OK, "User sessions fetched"));
+        //}
         [HttpGet("me")]
         public async Task<IActionResult> GetMySessions()
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
             var role = User.FindFirst(ClaimTypes.Role)?.Value ?? "";
 
-            var sessions = await _sessionService.GetSessionsForUserAsync(userId, role);
+            var sessions = await _sessionService.GetSessionsForMentorAsync(userId);
             var dto = _mapper.Map<IEnumerable<SessionDto>>(sessions);
 
             return Ok(ApiResponse<IEnumerable<SessionDto>>.SuccessResponse(dto, StatusCodes.Status200OK, "Sessions fetched"));

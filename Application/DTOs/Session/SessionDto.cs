@@ -21,8 +21,8 @@ namespace MyApp1.Application.DTOs.Session
     public class SessionDto
     {
         public int Id { get; set; }
-        public int MentorId { get; set; }
-        public int SkillId { get; set; }
+        public string Mentor { get; set; } = string.Empty;
+        public string Skill { get; set; } = string.Empty;
         public DateTime ScheduledAt { get; set; }
         public string Mode { get; set; } = string.Empty;
         public int? MaxParticipants { get; set; }

@@ -130,6 +130,7 @@ namespace MyApp1.API.Controllers.UserControllers
         public async Task<IActionResult> GetMessages(int id)
         {
             var messages = await _groupService.GetMessagesAsync(id);
+
             var messageDtos = _mapper.Map<IEnumerable<GroupMessageDto>>(messages);
             return Ok(ApiResponse<IEnumerable<GroupMessageDto>>.SuccessResponse(messageDtos, StatusCodes.Status200OK, "Messages fetched"));
         }

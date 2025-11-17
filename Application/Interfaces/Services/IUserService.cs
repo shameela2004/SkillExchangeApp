@@ -10,7 +10,9 @@ namespace MyApp1.Application.Interfaces.Services
 {
     public interface IUserService
     {
+        Task<IEnumerable<UserDto>> GetAllUserDtosAsync();
         Task<User?> GetUserByIdAsync(int id);
+        Task<UserDto> GetUserDtoByIdAsync(int id);
         Task<User?> GetUserByEmailAsync(string email);
         Task<bool> UpdateUserAsync(int userId,UpdateUserDto updatedUser);
         Task<IEnumerable<UserBadge>> GetUserBadgesAsync(int userId);

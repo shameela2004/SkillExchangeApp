@@ -16,14 +16,20 @@ namespace MyApp1.Infrastructure.Services
     {
         private readonly IGenericRepository<User> _userRepository;
         private readonly IGenericRepository<MentorProfile> _mentorProfileRepository;
+        private readonly INotificationService _notificationService;
+        private readonly INotificationSender _notificationSender;
         private readonly IMapper _mapper;
             public MentorService(
             IGenericRepository<User> userRepository,
             IGenericRepository<MentorProfile> mentorProfileRepository,
+            INotificationService notificationService,
+            INotificationSender notificationSender,
             IMapper mapper)
         {
             _userRepository = userRepository;
             _mentorProfileRepository = mentorProfileRepository;
+            _notificationService = notificationService;
+            _notificationSender = notificationSender;
             _mapper = mapper;
         }
         public async Task<bool> ApplyMentorAsync(int userId, MentorApplicationDto dto)
@@ -211,6 +217,16 @@ namespace MyApp1.Infrastructure.Services
             user.MentorStatus = "Approved";
             user.Role = "Mentor"; // Change role to Mentor
             await _userRepository.UpdateAsync(user);
+            // Create notification
+            var notificationId = await _notificationService.CreateNotificationAsync(
+                userId,
+                "Mentor Status Changed",
+                "Congratulations! Your mentor status has been approved.",
+                "Mentor");
+
+            // Push real-time notification with SignalR Hub
+            // Push real-time notification using INotificationSender abstraction
+            await _notificationSender.SendNotification(userId.ToString(), "Congratulations! Your mentor status has been approved.");
             return true;
         }
 
@@ -224,6 +240,15 @@ namespace MyApp1.Infrastructure.Services
             user.MentorStatus = "Rejected";
             user.Role = "Learner"; // Revert role to Learner
             await _userRepository.UpdateAsync(user);
+            // Create notification
+            await _notificationService.CreateNotificationAsync(
+                userId,
+                "Mentor Status Changed",
+                "Your mentor request has been rejected.",
+                "Mentor");
+
+            // Send real-time notification
+            await _notificationSender.SendNotification(userId.ToString(), "Your mentor request has been rejected.");
             return true;
         }
 

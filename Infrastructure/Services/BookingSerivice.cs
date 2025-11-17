@@ -207,6 +207,7 @@ namespace MyApp1.Infrastructure.Services
         public async Task<IEnumerable<Booking>> GetPendingBookingsForMentorAsync(int mentorId)
         {
             return await _bookingRepo.Table
+                .Include(b=>b.Learner)
                 .Include(b => b.Session)
                 .Where(b => b.Session.MentorId == mentorId && b.Status == "Pending" && !b.IsCancelled)
                 .ToListAsync();

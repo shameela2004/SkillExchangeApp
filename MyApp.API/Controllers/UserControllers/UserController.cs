@@ -28,7 +28,7 @@ public class UserController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllUsers()
     {
-        var users = await _userGenericService.GetAllAsync();
+        var users = await _userService.GetAllUserDtosAsync();
         var userDtos = _mapper.Map<IEnumerable<UserDto>>(users);
         return Ok(ApiResponse<IEnumerable<UserDto>>.SuccessResponse(userDtos, StatusCodes.Status200OK, "Users fetched"));
     }
@@ -36,7 +36,7 @@ public class UserController : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetUserById(int id)
     {
-        var user = await _userService.GetUserByIdAsync(id);
+        var user = await _userService.GetUserDtoByIdAsync(id);
 
         if (user == null)
             return NotFound(ApiResponse<string>.FailResponse(StatusCodes.Status404NotFound, "User not found"));
@@ -49,7 +49,7 @@ public class UserController : ControllerBase
     public async Task<IActionResult> GetUserProfile()
     {
         var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-        var user = await _userService.GetUserByIdAsync(userId);
+        var user = await _userService.GetUserDtoByIdAsync(userId);
         if (user == null)
             return NotFound(ApiResponse<string>.FailResponse(StatusCodes.Status404NotFound, "User not found"));
 

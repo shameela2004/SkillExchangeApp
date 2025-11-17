@@ -23,7 +23,8 @@ namespace MyApp1.Application.Common.Mappings
     .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.ToString()));
 
 
-            CreateMap<GroupMessage, GroupMessageDto>().ReverseMap();
+            CreateMap<GroupMessage, GroupMessageDto>()
+                .ReverseMap();
             CreateMap<SendGroupMessageDto, GroupMessage>();
         }
     }

@@ -9,7 +9,9 @@ namespace MyApp1.Application.Interfaces.Services
 {
     public interface INotificationService
     {
-        Task<IEnumerable<Notification>> GetNotificationsAsync(int userId);
+        Task<IEnumerable<Notification>> GetUserNotificationsAsync(int userId);
+        Task<int> CreateNotificationAsync(int userId, string title, string message, string type);
+        Task<bool> MarkNotificationAsReadAsync(int notificationId);
 
     }
 }
