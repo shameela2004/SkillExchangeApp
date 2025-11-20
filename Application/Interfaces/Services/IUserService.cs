@@ -10,6 +10,7 @@ namespace MyApp1.Application.Interfaces.Services
 {
     public interface IUserService
     {
+        Task<string> UpdateProfilePictureAsync(int userId);
         Task<IEnumerable<UserDto>> GetAllUserDtosAsync();
         Task<User?> GetUserByIdAsync(int id);
         Task<UserDto> GetUserDtoByIdAsync(int id);

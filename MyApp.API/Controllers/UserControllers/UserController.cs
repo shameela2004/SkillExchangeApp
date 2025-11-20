@@ -25,6 +25,13 @@ public class UserController : ControllerBase
         _userGenericService = userGenericService;
         _otpService = otpService;
     }
+    [HttpPost("updateProfilePicture")]
+    public async Task<IActionResult> UpdateProfilePictureAsync()
+    {
+        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+        var url= await _userService.UpdateProfilePictureAsync(userId);
+        return Ok(ApiResponse<string>.SuccessResponse(url, StatusCodes.Status200OK, "profile picture in user table updated successfully"));
+    }
     [HttpGet]
     public async Task<IActionResult> GetAllUsers()
     {

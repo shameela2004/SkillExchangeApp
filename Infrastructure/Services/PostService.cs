@@ -36,7 +36,7 @@ namespace MyApp1.Infrastructure.Services
             _notificationService = notificationService;
             _textParser = textParser;
         }
-        public async Task<IEnumerable<Post>> GetPostsAsync(int page, int pageSize, string sortBy, bool descending)
+        public async Task<IEnumerable<PostDto>> GetPostsAsync(int page, int pageSize, string sortBy, bool descending, int userId)
         {
             IQueryable<Post> query = _postRepository.Table.Include(p => p.User);
 
@@ -52,9 +52,32 @@ namespace MyApp1.Infrastructure.Services
                 _ => query.OrderByDescending(p => p.CreatedAt)
             };
 
-            // Paging
-            return await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+            // Get liked posts for this user
+            var likedPostIds = await _postLikeRepository.Table
+                 .Where(pl => pl.UserId == userId && !pl.IsDeleted)
+                 .Select(pl => pl.PostId)
+                 .ToListAsync();
+
+            var posts = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            // Project to DTO with HasLiked
+            var postDtos = posts.Select(post => new PostDto
+            {
+                PostId = post.Id,
+                UserId = post.UserId,
+                UserName = post.User.Name,
+                Content = post.Content,
+                MediaUrl = post.MediaUrl,
+                LikeCount = post.LikeCount,
+                CommentCount = post.CommentCount,
+                CreatedAt = post.CreatedAt,
+                HasLiked = likedPostIds.Contains(post.Id) // <-- here is the magic!
+            })
+            .ToList();
+
+            return postDtos;
         }
+
 
         public async Task<Post?> GetPostByIdAsync(int postId)
         {
@@ -137,7 +160,7 @@ namespace MyApp1.Infrastructure.Services
         //Post Commments
         public async Task<IEnumerable<PostComment>> GetCommentsByPostIdAsync(int postId, int page, int pageSize, string sortBy, bool descending)
         {
-            IQueryable<PostComment> query = _postCommentRepository.Table.Include(c => c.User).Where(c => c.PostId == postId);
+            IQueryable<PostComment> query = _postCommentRepository.Table.Include(c => c.User).Where(c => c.PostId == postId && !c.IsDeleted);
 
             query = (sortBy.ToLower(), descending) switch
             {
@@ -185,12 +208,24 @@ namespace MyApp1.Infrastructure.Services
             }
             return true;
         }
+        public async Task<bool> DeleteCommentAsync(int commentId)
+        {
+            var comment=await _postCommentRepository.GetByIdAsync(commentId);
+            if(comment == null) return false;
+            var post = await _postRepository.GetByIdAsync(comment.PostId);
+            post.CommentCount -= 1;
+            await _postRepository.UpdateAsync(post);
+            _postCommentRepository.Remove(comment);
+            await _postCommentRepository.SaveChangesAsync();
+          
+            return true;
+        }
 
         // Post Likes
         public async Task<bool> ToggleLikePostAsync(int postId, int userId)
         {
             var existingLike = await _postLikeRepository.Table
-                .FirstOrDefaultAsync(pl => pl.PostId == postId && pl.UserId == userId);
+                .FirstOrDefaultAsync(pl => pl.PostId == postId && pl.UserId == userId && !pl.IsDeleted);
 
             var post = await _postRepository.GetByIdAsync(postId);
             if (post == null) return false;

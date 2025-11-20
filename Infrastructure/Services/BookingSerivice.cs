@@ -38,7 +38,7 @@ namespace MyApp1.Infrastructure.Services
             _mediaService = mediaService;
             _paymentRepo = paymentRepo;
         }
-        public async Task<int> BookSessionAsync(BookSessionDto dto, int learnerId)
+        public async Task<BookingResponseDto> BookSessionAsync(BookSessionDto dto, int learnerId)
         {
             var session = await _sessionRepo.GetByIdAsync(dto.SessionId);
             if (session == null)
@@ -96,8 +96,16 @@ namespace MyApp1.Infrastructure.Services
                 booking.PaymentStatus = "Free";
                 await _bookingRepo.UpdateAsync(booking);
             }
+            var getPayment = await _paymentRepo.GetByIdAsync(booking.PaymentId.GetValueOrDefault());
 
-            return booking.Id;
+            var response = new BookingResponseDto
+            {
+                BookingId = booking.Id,
+                PaymentId = getPayment?.Id ?? 0,
+                RazorpayOrderId = getPayment?.RazorpayOrderId ?? string.Empty
+            };
+
+            return response;
         }
 
         public async Task<BookingResponseDto> BookGroupSessionAsync(BookSessionDto dto, int learnerId)
@@ -247,22 +255,24 @@ namespace MyApp1.Infrastructure.Services
             var bookings = await _bookingRepo.Table
                 .Include(b => b.Learner)
                 .Include(b => b.Session)
+                .ThenInclude(s=>s.Mentor)
+                .Include(b=>b.Session)
                 .ThenInclude(s => s.Skill)
                 .Where(b => b.LearnerId == userId && b.Session.ScheduledAt>DateTime.Now && !b.IsCancelled)
                 .ToListAsync();
             var bookingDtos = _mapper.Map<List<BookingDto>>(bookings);
 
-            foreach (var bookingDto in bookingDtos)
-            {
-                var profileMedia = await _mediaService.GetMediaByReferenceAsync("UserProfile", bookingDto.MentorId);
+            //foreach (var bookingDto in bookingDtos)
+            //{
+            //    var profileMedia = await _mediaService.GetMediaByReferenceAsync("UserProfile", bookingDto.MentorId);
 
-                var profileImage = profileMedia.OrderByDescending(m => m.Id).FirstOrDefault();
+            //    var profileImage = profileMedia.OrderByDescending(m => m.Id).FirstOrDefault();
 
-                if (profileImage != null)
-                {
-                    bookingDto.MentorProfilePictureUrl = $"/api/media/{profileImage.Id}";
-                }
-            }
+            //    if (profileImage != null)
+            //    {
+            //        bookingDto.MentorProfilePictureUrl = $"/api/media/{profileImage.Id}";
+            //    }
+            //}
             return bookingDtos;
         }
 

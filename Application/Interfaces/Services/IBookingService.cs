@@ -11,7 +11,7 @@ namespace MyApp1.Application.Interfaces.Services
 {
     public interface IBookingService
     {
-        Task<int> BookSessionAsync(BookSessionDto dto, int learnerId);
+        Task<BookingResponseDto> BookSessionAsync(BookSessionDto dto, int learnerId);
         Task<BookingResponseDto> BookGroupSessionAsync(BookSessionDto dto, int learnerId);
         Task<Booking?> GetBookingByIdAsync(int bookingId);
         Task<IEnumerable<Booking>> GetBookingsByUserIdAsync(int userId);

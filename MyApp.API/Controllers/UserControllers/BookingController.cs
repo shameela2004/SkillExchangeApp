@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -28,8 +29,8 @@ namespace MyApp1.API.Controllers.UserControllers
         public async Task<IActionResult> BookSession([FromBody] BookSessionDto dto)
         {
             var learnerId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-            var bookingId = await _bookingService.BookSessionAsync(dto, learnerId);
-            return Ok(ApiResponse<int>.SuccessResponse(bookingId, StatusCodes.Status201Created, "Session booked"));
+            var response = await _bookingService.BookSessionAsync(dto, learnerId);
+            return Ok(ApiResponse<BookingResponseDto>.SuccessResponse(response, StatusCodes.Status201Created, "Group session booked"));
         }
 
         [HttpGet("{id}")]

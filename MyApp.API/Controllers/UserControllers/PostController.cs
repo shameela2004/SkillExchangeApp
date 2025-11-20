@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 using MyApp1.Application.Common;
 using MyApp1.Application.DTOs.Post;
 using MyApp1.Application.Exceptions;
@@ -31,7 +32,8 @@ namespace MyApp1.API.Controllers.UserControllers
         public async Task<IActionResult> GetPosts([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string sortBy = "CreatedAt",
     [FromQuery] bool descending = true)
         {
-            var posts = await _postService.GetPostsAsync(page, pageSize, sortBy, descending);
+            int userId= int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var posts = await _postService.GetPostsAsync(page, pageSize, sortBy, descending,userId);
             var postsDto = _mapper.Map<IEnumerable<PostDto>>(posts);
             return Ok(ApiResponse<IEnumerable<PostDto>>.SuccessResponse(postsDto, StatusCodes.Status200OK, "Posts fetched successfully"));
         }
@@ -107,7 +109,7 @@ namespace MyApp1.API.Controllers.UserControllers
                 return BadRequest(ApiResponse<string>.FailResponse(StatusCodes.Status400BadRequest, "Failed to add comment"));
             return Ok(ApiResponse<string>.SuccessResponse(null, StatusCodes.Status201Created, "Comment added successfully"));
         }
-        [HttpPut("{id:int}")]
+        [HttpPut("{id:int}/comment")]
         public async Task<IActionResult> EditComment(int id, [FromBody] EditCommentDto editDto)
         {
             var comment = await _commentService.GetByIdAsync(id);
@@ -121,13 +123,13 @@ namespace MyApp1.API.Controllers.UserControllers
             return Ok(ApiResponse<string>.SuccessResponse(null, StatusCodes.Status200OK, "Comment updated successfully"));
         }
 
-        [HttpDelete("{id:int}")]
+        [HttpDelete("{id:int}/comments")]
         public async Task<IActionResult> DeleteComment(int id)
         {
             try
             {
-                await _commentService.DeleteAsync(id);
-                return Ok(ApiResponse<string>.SuccessResponse(null, StatusCodes.Status200OK, "Comment deleted successfully"));
+                await _postService.DeleteCommentAsync(id);
+                return Ok(ApiResponse<string>.SuccessResponse("success", StatusCodes.Status200OK, "Comment deleted successfully"));
             }
             catch (NotFoundException ex)
             {

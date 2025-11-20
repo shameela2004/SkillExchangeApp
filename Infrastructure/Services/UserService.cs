@@ -34,7 +34,22 @@ namespace MyApp1.Infrastructure.Services
             _mapper = mapper;
             _mediaService = mediaService;
         }
+        public async Task<string> UpdateProfilePictureAsync(int userId)
+        {
+            var profileMedia = await _mediaService.GetMediaByReferenceAsync("UserProfile", userId);
+            var profileImage = profileMedia
+                .OrderByDescending(m => m.Id)
+                .FirstOrDefault();
 
+            if (profileImage == null)
+            {
+                return "No Image";
+            }
+            var user = await _userRepository.GetByIdAsync(userId);
+            user.ProfilePictureUrl = $"/api/media/{profileImage.Id}";
+            await _userRepository.UpdateAsync(user);
+            return user.ProfilePictureUrl;
+        }
         public async Task<IEnumerable<UserDto>> GetAllUserDtosAsync()
         {
             // Get all non-deleted, non-admin users + eager load related entities if needed
