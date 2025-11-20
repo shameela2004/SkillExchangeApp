@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using MyApp1.Application.DTOs.Booking;
 using MyApp1.Application.DTOs.Mentor;
 using MyApp1.Application.Interfaces.Services;
 using MyApp1.Domain.Entities;
@@ -18,20 +19,84 @@ namespace MyApp1.Infrastructure.Services
         private readonly IGenericRepository<MentorProfile> _mentorProfileRepository;
         private readonly INotificationService _notificationService;
         private readonly INotificationSender _notificationSender;
+        private readonly IGenericRepository<User> _userRepo;
+        private readonly IMediaService _mediaService;
         private readonly IMapper _mapper;
             public MentorService(
             IGenericRepository<User> userRepository,
             IGenericRepository<MentorProfile> mentorProfileRepository,
             INotificationService notificationService,
             INotificationSender notificationSender,
+            IGenericRepository<User> userRepo,
+            IMediaService mediaService,
             IMapper mapper)
         {
             _userRepository = userRepository;
             _mentorProfileRepository = mentorProfileRepository;
             _notificationService = notificationService;
             _notificationSender = notificationSender;
+            _userRepo = userRepo;
+            _mediaService = mediaService;
             _mapper = mapper;
         }
+
+
+        public async Task<List<MentorDto>> SearchMentorsAsync(SearchMentorDto filter)
+        {
+            var query = _userRepo.Table.Where(u =>
+                u.Role == "Mentor" &&
+                u.MentorStatus == "Approved"
+            );
+
+            // Filter by skills if provided
+            if (filter.Skills != null && filter.Skills.Any())
+            {
+                query = query.Where(u =>
+                    u.UserSkills != null &&
+                    u.UserSkills.Any(us => filter.Skills.Contains(us.Skill.Name) && !us.IsDeleted && us.Type=="Teaching") 
+
+                );
+            }
+
+            // Filter by location if provided
+            if (!string.IsNullOrWhiteSpace(filter.Location))
+            {
+                query = query.Where(u => u.Location != null &&
+                                         u.Location.Contains(filter.Location));
+            }
+
+            // Search by term (name or bio)
+            if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
+            {
+                query = query.Where(u =>
+                    (u.Name.Contains(filter.SearchTerm) || (u.Bio != null && u.Bio.Contains(filter.SearchTerm)))
+                );
+            }
+
+            // Pagination
+            int skip = (filter.PageNumber - 1) * filter.PageSize;
+            var mentors = await query
+                .OrderBy(u => u.Name)
+                .Skip(skip)
+                .Take(filter.PageSize)
+                .ToListAsync();
+
+             var mentorsDto= _mapper.Map<List<MentorDto>>(mentors);
+
+            foreach (var mentorDto in mentorsDto)
+            {
+                var profileMedia = await _mediaService.GetMediaByReferenceAsync("UserProfile", mentorDto.UserId);
+
+                var profileImage = profileMedia.OrderByDescending(m => m.Id).FirstOrDefault();
+
+                if (profileImage != null)
+                {
+                    mentorDto.MentorProfilePictureUrl = $"/api/media/{profileImage.Id}";
+                }
+            }
+            return mentorsDto;
+        }
+
         public async Task<bool> ApplyMentorAsync(int userId, MentorApplicationDto dto)
         {
             var user = await _userRepository.GetByIdAsync(userId);

@@ -106,7 +106,13 @@ namespace MyApp1.Application.Common.Mappings
             // Booking
             CreateMap<BookSessionDto, Booking>();
             CreateMap<Booking, BookingDto>()
-                .ForMember(dest => dest.LearnerName, opt => opt.MapFrom(src => src.Learner.Name));
+                            .ForMember(d => d.MentorId, opt => opt.MapFrom(b => b.Session.Mentor.Id))
+                            .ForMember(d => d.MentorName, opt => opt.MapFrom(b => b.Session.Mentor.Name))
+                            .ForMember(d => d.MentorProfilePictureUrl, opt => opt.MapFrom(b => b.Session.Mentor.ProfilePictureUrl))
+                .ForMember(dest => dest.LearnerName, opt => opt.MapFrom(src => src.Learner.Name))
+                .ForMember(dest => dest.SessionDate, opt => opt.MapFrom(src => src.Session.ScheduledAt))
+                .ForMember(dest => dest.Skill, opt => opt.MapFrom(src => src.Session.Skill.Name))
+                .ForMember(dest => dest.Mode, opt => opt.MapFrom(src => src.Session.Mode));
 
 
 

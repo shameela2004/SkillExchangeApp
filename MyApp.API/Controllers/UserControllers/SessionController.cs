@@ -82,6 +82,15 @@ namespace MyApp1.API.Controllers.UserControllers
 
             return Ok(ApiResponse<IEnumerable<SessionDto>>.SuccessResponse(dto, StatusCodes.Status200OK, "Sessions fetched"));
         }
+        [HttpGet("mentor/{mentorId}")]
+        public async Task<IActionResult> GetMentorSessions(int mentorId)
+        {
+            // Optionally filter to only future and not-completed sessions here, or do it in service
+            var sessions = await _sessionService.GetUpcomingSessionsForMentorAsync(mentorId);
+            var dto = _mapper.Map<IEnumerable<SessionDto>>(sessions);
+            return Ok(ApiResponse<IEnumerable<SessionDto>>.SuccessResponse(dto, StatusCodes.Status200OK, "Mentor sessions fetched"));
+        }
+
 
         [HttpPost("{id}/complete")]
         public async Task<IActionResult> CompleteSession(int id)

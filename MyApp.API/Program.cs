@@ -14,12 +14,14 @@ using MyApp1.Application.DependencyInjection;
 using MyApp1.Application.Interfaces.Services;
 using MyApp1.Application.Services;
 using MyApp1.Domain.Interfaces;
+using MyApp1.Infrastructure.AutoMapper;
 using MyApp1.Infrastructure.Data;
 using MyApp1.Infrastructure.DependencyInjection;
 using MyApp1.Infrastructure.Helpers;
 using MyApp1.Infrastructure.Repositories;
 using MyApp1.Infrastructure.Seeders;
 using System.IO;
+using System.Reflection;
 using System.Text;
 
 namespace MyApp.API
@@ -140,6 +142,10 @@ namespace MyApp.API
                 };
             });
             builder.Services.AddSingleton<IUserIdProvider, NameUserIdProvider>();
+            builder.Services.AddScoped<UserProfilePictureResolver>();
+            builder.Services.AddScoped<IUserProfilePictureProvider, UserProfilePictureProvider>();
+
+
 
             builder.Services.AddApplicationServices();
             builder.Services.AddInfrastructureServices(builder.Configuration);
@@ -156,8 +162,6 @@ namespace MyApp.API
                         .AllowCredentials();
                 });
             });
-
-
 
 
             var app = builder.Build();

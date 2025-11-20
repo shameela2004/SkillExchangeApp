@@ -16,6 +16,7 @@ namespace MyApp1.Application.Interfaces.Services
         Task<Session?> GetSessionByIdAsync(int sessionId);
         Task<IEnumerable<Session>> GetSessionsForUserAsync(int userId, string role);
         Task<IEnumerable<Session>> GetSessionsForMentorAsync(int userId);
+        Task<IEnumerable<Session>> GetUpcomingSessionsForMentorAsync(int mentorId);
         Task<bool> MarkSessionCompletedAsync(int sessionId);
     }
 

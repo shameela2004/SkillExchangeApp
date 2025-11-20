@@ -1,9 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using MyApp1.Application.DTOs.Booking;
 using MyApp1.Application.DTOs.Payment;
+using MyApp1.Application.DTOs.User;
 using MyApp1.Application.Interfaces.Services;
 using MyApp1.Domain.Entities;
 using MyApp1.Domain.Interfaces;
+using MyApp1.Infrastructure.Helpers;
 using MyApp1.Infrastructure.RazorPay;
 using System;
 using System.Collections.Generic;
@@ -19,16 +22,20 @@ namespace MyApp1.Infrastructure.Services
         private readonly IGenericRepository<Session> _sessionRepo;
         private readonly IGenericRepository<GroupSession> _groupSessionRepo;
         private readonly IGenericRepository<GroupMember> _groupMemberRepo;
+        private readonly IMapper _mapper;
+        private readonly IMediaService _mediaService;
         private readonly IGenericRepository<Payment> _paymentRepo;
         private readonly RazorpayService _razorpayService;
 
-        public BookingService(IGenericRepository<Booking> bookingRepo, IGenericRepository<Session> sessionRepo, IGenericRepository<GroupSession> groupSessionRepo, IGenericRepository<GroupMember> groupMemberRepo, RazorpayService razorpayService, IGenericRepository<Payment> paymentRepo)
+        public BookingService(IGenericRepository<Booking> bookingRepo, IGenericRepository<Session> sessionRepo, IGenericRepository<GroupSession> groupSessionRepo, IGenericRepository<GroupMember> groupMemberRepo, RazorpayService razorpayService, IGenericRepository<Payment> paymentRepo,IMapper mapper,IMediaService mediaService)
         {
             _bookingRepo = bookingRepo;
             _sessionRepo = sessionRepo;
             _groupSessionRepo = groupSessionRepo;
             _groupMemberRepo = groupMemberRepo;
             _razorpayService = razorpayService;
+            _mapper = mapper;
+            _mediaService = mediaService;
             _paymentRepo = paymentRepo;
         }
         public async Task<int> BookSessionAsync(BookSessionDto dto, int learnerId)
@@ -179,7 +186,7 @@ namespace MyApp1.Infrastructure.Services
 
         public async Task<IEnumerable<Booking>> GetBookingsByUserIdAsync(int userId)
         {
-            return await _bookingRepo.Table.Where(b => b.LearnerId == userId && !b.IsCancelled).ToListAsync();
+            return await _bookingRepo.Table.Where(b => b.LearnerId == userId ).ToListAsync();
         }
 
         public async Task<bool> CancelBookingAsync(int bookingId, string? reason)
@@ -204,11 +211,67 @@ namespace MyApp1.Infrastructure.Services
            await  _bookingRepo.UpdateAsync(booking);
             return true;
         }
+
+        public async Task<IEnumerable<BookingDto>> GetMyPastBookingsAsync(int userId)
+        {
+            var bookings = await _bookingRepo.Table
+                .Include(b => b.Learner)
+                 .Include(b => b.Session)
+        .ThenInclude(s => s.Skill)
+    .Include(b => b.Session)
+        .ThenInclude(s => s.Mentor)
+                .Where(b => b.LearnerId == userId && (b.Session.ScheduledAt < DateTime.Now || b.IsCancelled))
+                .ToListAsync();
+            var bookingDtos = _mapper.Map<List<BookingDto>>(bookings);
+
+            foreach (var bookingDto in bookingDtos)
+            {
+                var profileMedia = await _mediaService.GetMediaByReferenceAsync("UserProfile", bookingDto.MentorId);
+
+                var profileImage = profileMedia.OrderByDescending(m => m.Id).FirstOrDefault();
+
+                if (profileImage != null)
+                {
+                    bookingDto.MentorProfilePictureUrl = $"/api/media/{profileImage.Id}";
+                }
+            }
+
+            return bookingDtos;
+
+
+
+        }
+
+        public async Task<IEnumerable<BookingDto>> GetUpcomingBookingsForUserAsync(int userId)
+        {
+            var bookings = await _bookingRepo.Table
+                .Include(b => b.Learner)
+                .Include(b => b.Session)
+                .ThenInclude(s => s.Skill)
+                .Where(b => b.LearnerId == userId && b.Session.ScheduledAt>DateTime.Now && !b.IsCancelled)
+                .ToListAsync();
+            var bookingDtos = _mapper.Map<List<BookingDto>>(bookings);
+
+            foreach (var bookingDto in bookingDtos)
+            {
+                var profileMedia = await _mediaService.GetMediaByReferenceAsync("UserProfile", bookingDto.MentorId);
+
+                var profileImage = profileMedia.OrderByDescending(m => m.Id).FirstOrDefault();
+
+                if (profileImage != null)
+                {
+                    bookingDto.MentorProfilePictureUrl = $"/api/media/{profileImage.Id}";
+                }
+            }
+            return bookingDtos;
+        }
+
         public async Task<IEnumerable<Booking>> GetPendingBookingsForMentorAsync(int mentorId)
         {
             return await _bookingRepo.Table
                 .Include(b=>b.Learner)
                 .Include(b => b.Session)
+                .ThenInclude(s => s.Skill)
                 .Where(b => b.Session.MentorId == mentorId && b.Status == "Pending" && !b.IsCancelled)
                 .ToListAsync();
         }

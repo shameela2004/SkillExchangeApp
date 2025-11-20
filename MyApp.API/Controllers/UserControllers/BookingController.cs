@@ -11,6 +11,7 @@ namespace MyApp1.API.Controllers.UserControllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class BookingController : ControllerBase
     {
         private readonly IBookingService _bookingService;
@@ -42,6 +43,14 @@ namespace MyApp1.API.Controllers.UserControllers
             return Ok(ApiResponse<BookingDto>.SuccessResponse(dto, StatusCodes.Status200OK, "Booking details"));
         }
 
+        [HttpGet("past")]
+        public async Task<IActionResult> GetMyPastBookings()
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var bookings = await _bookingService.GetMyPastBookingsAsync(userId);
+            return Ok(ApiResponse<IEnumerable<BookingDto>>.SuccessResponse(bookings, StatusCodes.Status200OK, "Past bookings fetched"));
+        }
+
         [HttpGet("user/{userId}")]
         public async Task<IActionResult> GetBookingsForUser(int userId)
         {
@@ -57,6 +66,13 @@ namespace MyApp1.API.Controllers.UserControllers
             if (!success)
                 return BadRequest(ApiResponse<string>.FailResponse(StatusCodes.Status400BadRequest, "Cancellation failed"));
             return Ok(ApiResponse<string>.SuccessResponse("Cancelled", StatusCodes.Status200OK, "Booking cancelled"));
+        }
+        [HttpGet("Upcoming")]
+        public async Task<IActionResult> GetUpcomingBookings()
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var bookings = await _bookingService.GetUpcomingBookingsForUserAsync(userId);
+            return Ok(ApiResponse<IEnumerable<BookingDto>>.SuccessResponse(bookings, 200, "Upcoming bookings fetched"));
         }
         [Authorize(Roles = "Mentor")]
         [HttpGet("pending")]

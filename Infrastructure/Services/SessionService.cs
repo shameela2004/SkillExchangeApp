@@ -141,6 +141,17 @@ namespace MyApp1.Infrastructure.Services
             return await query.ToListAsync();
         }
 
+        public async Task<IEnumerable<Session>> GetUpcomingSessionsForMentorAsync(int mentorId)
+        {
+            var now = DateTime.UtcNow;
+            return await _sessionRepository.Table
+                .Include(s => s.Mentor)
+                .Include(s => s.Skill)
+                .Where(s => s.MentorId == mentorId && !s.IsCompleted && s.ScheduledAt > now)
+
+                .ToListAsync();
+        }
+
         public async Task<bool> MarkSessionCompletedAsync(int sessionId)
         {
             var session = await _sessionRepository.GetByIdAsync(sessionId);

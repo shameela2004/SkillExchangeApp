@@ -17,6 +17,8 @@ namespace MyApp1.Application.Interfaces.Services
         Task<IEnumerable<Booking>> GetBookingsByUserIdAsync(int userId);
         Task<bool> CancelBookingAsync(int bookingId, string? reason);
         Task<bool> UpdateBookingStatusAsync(int bookingId, string status);
+        Task<IEnumerable<BookingDto>> GetMyPastBookingsAsync(int userId);
+        Task<IEnumerable<BookingDto>> GetUpcomingBookingsForUserAsync(int userId);
         Task<IEnumerable<Booking>> GetPendingBookingsForMentorAsync(int mentorId);
         Task<bool> ApproveBookingAsync(int bookingId);
         Task<bool> RejectBookingAsync(int bookingId, string? reason);

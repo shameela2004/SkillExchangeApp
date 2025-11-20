@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyApp1.Application.Common;
 using MyApp1.Application.DTOs.Mentor;
@@ -12,10 +13,19 @@ using System.Security.Claims;
 public class MentorController : ControllerBase
 {
     private readonly IMentorService _mentorService;
+    private readonly IMapper _mapper;
 
-    public MentorController(IMentorService mentorService)
+    public MentorController(IMentorService mentorService, IMapper mapper)
     {
         _mentorService = mentorService;
+        _mapper = mapper;
+    }
+    [HttpPost("search")]
+    public async Task<IActionResult> SearchMentors([FromBody] SearchMentorDto filterDto)
+    {
+        var mentors = await _mentorService.SearchMentorsAsync(filterDto);
+        var mentorDtos = _mapper.Map<IEnumerable<MentorDto>>(mentors);
+        return Ok(ApiResponse<IEnumerable<MentorDto>>.SuccessResponse(mentorDtos, StatusCodes.Status200OK, "Mentors fetched"));
     }
 
     [HttpPost("apply-mentor")]
