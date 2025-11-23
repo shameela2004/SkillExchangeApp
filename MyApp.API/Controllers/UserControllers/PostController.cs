@@ -37,7 +37,19 @@ namespace MyApp1.API.Controllers.UserControllers
             var postsDto = _mapper.Map<IEnumerable<PostDto>>(posts);
             return Ok(ApiResponse<IEnumerable<PostDto>>.SuccessResponse(postsDto, StatusCodes.Status200OK, "Posts fetched successfully"));
         }
-        
+        [HttpGet("user/{profileUserId}")]
+        public async Task<IActionResult> GetPostsForUser(
+    int profileUserId,
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 10,
+    [FromQuery] string sortBy = "CreatedAt",
+    [FromQuery] bool descending = true)
+        {
+            int loggedInUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var posts = await _postService.GetPostsForUserAsync(profileUserId, loggedInUserId, page, pageSize, sortBy, descending);
+            return Ok(ApiResponse<IEnumerable<PostDto>>.SuccessResponse(posts, StatusCodes.Status200OK, "Posts fetched"));
+        }
+
 
         [HttpPost]
         public async Task<IActionResult> CreatePost([FromBody] CreatePostDto createDto)
@@ -147,6 +159,15 @@ namespace MyApp1.API.Controllers.UserControllers
                 return BadRequest(ApiResponse<string>.FailResponse(StatusCodes.Status400BadRequest, "Failed to toggle like"));
             return Ok(ApiResponse<string>.SuccessResponse(null, StatusCodes.Status200OK, "Like toggled successfully"));
         }
+        [Authorize]
+        [HttpGet("feed")]
+        public async Task<IActionResult> GetFeed(int page = 1, int pageSize = 10)
+        {
+            int userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var feed = await _postService.GetFeedAsync(userId, page, pageSize);
+            return Ok(ApiResponse<IEnumerable<PostDto>>.SuccessResponse(feed, 200, "Feed fetched"));
+        }
+
 
     }
 }

@@ -83,7 +83,26 @@ namespace MyApp1.API.Controllers.UserControllers
 
             return Ok(ApiResponse<IEnumerable<ConnectionDto>>.SuccessResponse(pendingConnections, StatusCodes.Status200OK, "Pending connections fetched"));
         }
-
-
+        [HttpGet("Connections/pendingRequests")]
+        public async Task<IActionResult> GetPendingRequestsSentAsync()
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var pendingRequests = await _connectionService.GetPendingRquestSentAsync(userId);
+            return Ok(ApiResponse<IEnumerable<ConnectionDto>>.SuccessResponse(pendingRequests, StatusCodes.Status200OK, "Pending connection requests fetched"));
+        }
+        [HttpGet("connections/count")]
+        public async Task<IActionResult> GetConnectionsCount()
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var count = await _connectionService.GetConnectionsCountAsync(userId);
+            return Ok(ApiResponse<int>.SuccessResponse(count, StatusCodes.Status200OK, "Connections count fetched"));
+        }
+        [HttpGet("connections/pending/count")]
+        public async Task<IActionResult> GetPendingRequestsCount()
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var count = await _connectionService.GetPendingRequestsCountAsync(userId);
+            return Ok(ApiResponse<int>.SuccessResponse(count, StatusCodes.Status200OK, "Pending requests count fetched"));
+        }
     }
 }

@@ -16,6 +16,9 @@ namespace MyApp1.Application.Interfaces.Services
         Task<bool> DeleteConnectionAsync(int connectionId, int actingUserId);
         Task<IEnumerable<ConnectionDto>> GetUserConnectionsAsync(int userId);
         Task<IEnumerable<ConnectionDto>> GetPendingConnectionsAsync(int userId);
+        Task<IEnumerable<ConnectionDto>> GetPendingRquestSentAsync(int userId);
+        Task<int> GetConnectionsCountAsync(int userId);
+        Task<int> GetPendingRequestsCountAsync(int userId);
 
     }
 }

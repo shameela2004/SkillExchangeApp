@@ -19,12 +19,14 @@ namespace MyApp1.Infrastructure.Services
         private readonly IGenericRepository<PostLike> _postLikeRepository;
         private readonly IGenericService<Notification> _notificationService;
         private readonly IGenericRepository<User> _userRepository;
+        private readonly IGenericRepository<Connection> _connectionRepository;
         private readonly SocialTextParser _textParser;
         public PostService(
             IGenericRepository<Post> postRepository,
             IGenericRepository<PostComment> postCommentRepository,
             IGenericRepository<PostLike> postLikeRepository,
             IGenericRepository<User> userRepository,
+            IGenericRepository<Connection> connectionRepository,
             IGenericService<Notification> notificationService,
             SocialTextParser textParser
             )
@@ -33,6 +35,7 @@ namespace MyApp1.Infrastructure.Services
             _postCommentRepository = postCommentRepository;
             _postLikeRepository = postLikeRepository;
             _userRepository = userRepository;
+            _connectionRepository = connectionRepository;
             _notificationService = notificationService;
             _textParser = textParser;
         }
@@ -77,6 +80,55 @@ namespace MyApp1.Infrastructure.Services
 
             return postDtos;
         }
+        public async Task<IEnumerable<PostDto>> GetPostsForUserAsync(
+    int profileUserId,
+    int loggedInUserId,
+    int page,
+    int pageSize,
+    string sortBy,
+    bool descending)
+        {
+            IQueryable<Post> query = _postRepository.Table
+                .Where(p => p.UserId == profileUserId)
+                .Include(p => p.User);
+
+            // Apply sorting (reuse your switch-case for sortBy/descending)
+            query = (sortBy.ToLower(), descending) switch
+            {
+                ("createdat", true) => query.OrderByDescending(p => p.CreatedAt),
+                ("createdat", false) => query.OrderBy(p => p.CreatedAt),
+                ("likecount", true) => query.OrderByDescending(p => p.LikeCount),
+                ("likecount", false) => query.OrderBy(p => p.LikeCount),
+                ("commentcount", true) => query.OrderByDescending(p => p.CommentCount),
+                ("commentcount", false) => query.OrderBy(p => p.CommentCount),
+                _ => query.OrderByDescending(p => p.CreatedAt)
+            };
+
+            var posts = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize).ToListAsync();
+
+            var postIds = posts.Select(p => p.Id).ToList();
+
+            var likedPostIds = await _postLikeRepository.Table
+                .Where(pl => pl.UserId == loggedInUserId && postIds.Contains(pl.PostId) && !pl.IsDeleted)
+                .Select(pl => pl.PostId)
+                .ToListAsync();
+
+            return posts.Select(post => new PostDto
+            {
+                PostId = post.Id,
+                UserId = post.UserId,
+                UserName = post.User.Name,
+                UserProfilePictureUrl = post.User.ProfilePictureUrl,
+                Content = post.Content,
+                MediaUrl = post.MediaUrl,
+                LikeCount = post.LikeCount,
+                CommentCount = post.CommentCount,
+                CreatedAt = post.CreatedAt,
+                HasLiked = likedPostIds.Contains(post.Id)
+            }).ToList();
+        }
 
 
         public async Task<Post?> GetPostByIdAsync(int postId)
@@ -94,6 +146,7 @@ namespace MyApp1.Infrastructure.Services
                 PostId = post.Id,
                 UserId = post.UserId,
                 UserName = post.User.Name,
+                UserProfilePictureUrl = post.User.ProfilePictureUrl,
                 Content = post.Content,
                 MediaUrl = post.MediaUrl,
                 CreatedAt = post.CreatedAt,
@@ -253,6 +306,53 @@ namespace MyApp1.Infrastructure.Services
             return true;
         }
 
+        public async Task<IEnumerable<PostDto>> GetFeedAsync(int userId, int page, int pageSize)
+        {
+            // Get connected user IDs
+            var connections = await _connectionRepository.Table
+                .Where(c => (c.UserId == userId || c.ConnectedUserId == userId)
+                            && c.Status == "Accepted"
+                            && !c.IsDeleted)
+                .Select(c => c.UserId == userId ? c.ConnectedUserId : c.UserId)
+                .ToListAsync();
+
+            // Include the user themselves
+            connections.Add(userId);
+
+            // Fetch posts from connections + self
+            var postsQuery = _postRepository.Table
+                .Include(p => p.User)
+                .Where(p => connections.Contains(p.UserId))
+                .OrderByDescending(p => p.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize);
+
+            var posts = await postsQuery.ToListAsync();
+
+            // Fetch liked post IDs for the user for all posts in feed for HasLiked
+            var postIds = posts.Select(p => p.Id).ToList();
+            var likedPostIds = await _postLikeRepository.Table
+                .Where(pl => pl.UserId == userId && postIds.Contains(pl.PostId) && !pl.IsDeleted)
+                .Select(pl => pl.PostId)
+                .ToListAsync();
+
+            // Map to DTOs including HasLiked
+            var postDtos = posts.Select(post => new PostDto
+            {
+                PostId = post.Id,
+                UserId = post.UserId,
+                UserName = post.User.Name,
+                UserProfilePictureUrl = post.User.ProfilePictureUrl,
+                Content = post.Content,
+                MediaUrl = post.MediaUrl,
+                LikeCount = post.LikeCount,
+                CommentCount = post.CommentCount,
+                CreatedAt = post.CreatedAt,
+                HasLiked = likedPostIds.Contains(post.Id)
+            }).ToList();
+
+            return postDtos;
+        }
 
     }
 }

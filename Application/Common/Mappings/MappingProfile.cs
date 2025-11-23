@@ -64,6 +64,7 @@ namespace MyApp1.Application.Common.Mappings
             CreateMap<Post, PostDto>()
     .ForMember(dest => dest.PostId, opt => opt.MapFrom(src => src.Id))
     .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.Name))
+    .ForMember(dest => dest.UserProfilePictureUrl, opt=>opt.MapFrom(src => src.User.ProfilePictureUrl))
     .ForMember(dest => dest.CommentCount, opt => opt.MapFrom(src => src.CommentCount))
     .ForMember(dest => dest.LikeCount, opt => opt.MapFrom(src => src.LikeCount))
     .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt));

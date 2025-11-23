@@ -11,6 +11,7 @@ namespace MyApp1.Application.DTOs.Post
         public int PostId { get; set; }
         public int UserId { get; set; }
         public string UserName { get; set; } = string.Empty;
+        public string UserProfilePictureUrl { get; set; } = string.Empty;
         public string Content { get; set; } = string.Empty;
         public string? MediaUrl { get; set; }
         public int LikeCount { get; set; }

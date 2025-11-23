@@ -11,8 +11,8 @@ namespace MyApp1.Application.Interfaces.Services
     public interface IPostService
     {
         Task<IEnumerable<PostDto>> GetPostsAsync(int page, int pageSize, string sortBy, bool descending, int userId);
+        Task<IEnumerable<PostDto>> GetPostsForUserAsync(int profileUserId, int loggedInUserId, int page, int pageSize, string sortBy, bool descending);
         Task<Post?> GetPostByIdAsync(int postId);
-
         Task<bool> CreatePostAsync(int userId, CreatePostDto createDto);
         Task<bool> EditPostAsync(int postId, int userId, EditPostDto editDto);
         Task<bool> DeletePostAsync(int postId);
@@ -20,6 +20,7 @@ namespace MyApp1.Application.Interfaces.Services
         Task<bool> AddCommentAsync(int postId, int userId, string commentText);
         Task<bool> DeleteCommentAsync(int commentId);
         Task<bool> ToggleLikePostAsync(int postId, int userId);
+      Task<IEnumerable<PostDto>> GetFeedAsync(int userId, int page, int pageSize);
 
     }
 }

@@ -142,6 +142,43 @@ namespace MyApp1.Infrastructure.Services
 
             return connectionDtos;
         }
+        public async Task<IEnumerable<ConnectionDto>> GetPendingRquestSentAsync(int userId)
+        {
+            var connections = await _connectionRepository.Table
+                .Include(c => c.User)
+                .Include(c => c.ConnectedUser)
+                .Where(c => c.UserId == userId   // pending requests sent *by* this user
+                            && c.Status == "Pending"
+                            && !c.IsDeleted)
+                .ToListAsync();
+            var connectionDtos = connections.Select(c => new ConnectionDto
+            {
+                ConnectionId = c.Id,
+                UserId = c.ConnectedUserId,
+                UserName = c.ConnectedUser.Name,
+                Status = c.Status,
+                CreatedAt = c.CreatedAt
+            }).ToList();
+            return connectionDtos;
+        }
+        public async Task<int> GetConnectionsCountAsync(int userId)
+        {
+            var count = await _connectionRepository.Table
+                .Where(c => (c.UserId == userId || c.ConnectedUserId == userId)
+                            && c.Status == "Accepted"
+                            && !c.IsDeleted)
+                .CountAsync();
+            return count;
+        }
+        public async Task<int> GetPendingRequestsCountAsync(int userId)
+        {
+            var count = await _connectionRepository.Table
+                .Where(c => c.ConnectedUserId == userId
+                            && c.Status == "Pending"
+                            && !c.IsDeleted)
+                .CountAsync();
+            return count;
+        }
 
     }
 
