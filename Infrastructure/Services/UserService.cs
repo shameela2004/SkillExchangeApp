@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using MyApp1.Application.DTOs.User;
+using MyApp1.Application.Exceptions;
 using MyApp1.Application.Interfaces.Services;
 using MyApp1.Domain.Entities;
 using MyApp1.Domain.Interfaces;
@@ -135,7 +136,8 @@ namespace MyApp1.Infrastructure.Services
             .ThenInclude(mp => mp.Availabilities.Where(a => !a.IsDeleted))
              .Include(u => u.Posts)
                 .Include(u => u.UserBadges)
-                .FirstOrDefaultAsync(u => u.Email == email && !u.IsDeleted && u.Role != "Admin");
+                 //.FirstOrDefaultAsync(u => u.Email == email && !u.IsDeleted && u.Role != "Admin");
+                 .FirstOrDefaultAsync(u => u.Email == email && !u.IsDeleted);
         }
         public async Task<bool> UpdateUserAsync(int userId,UpdateUserDto updatedUser)
         {
@@ -195,6 +197,18 @@ namespace MyApp1.Infrastructure.Services
             }
             return await query.ToListAsync();
         }
+        public async Task<bool> ToggleUserActiveAsync(int userId)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+                throw new NotFoundException("User not Found");
+
+            user.IsActive = !user.IsActive;
+            await _userRepository.SaveChangesAsync();
+
+            return user.IsActive;
+        }
+
 
     }
 }

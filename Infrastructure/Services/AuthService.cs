@@ -1,14 +1,17 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using MyApp1.Application.DTOs.Auth;
 using MyApp1.Application.Interfaces.Services;
 using MyApp1.Domain.Entities;
 using MyApp1.Domain.Interfaces;
 using MyApp1.Infrastructure.Helpers;
+using MyApp1.Infrastructure.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -75,6 +78,34 @@ namespace MyApp1.Application.Services
             var tokens = await _tokenService.RefreshTokenAsync(token, refreshToken);
             return tokens;
         }
+        // in AuthService implementation
+        public async Task<(JwtTokenResponse Tokens, User User)> RefreshTokenWithUserAsync(string accessToken, string refreshToken)
+        {
+            var tokens = await _tokenService.RefreshTokenAsync(accessToken, refreshToken);
+
+            // Get principal from the NEW access token
+            var principal = JwtHelper.GetPrincipalFromExpiredToken(tokens.Token, _configuration);
+            if (principal == null)
+                throw new SecurityTokenException("Invalid token");
+
+            var userId = int.Parse(principal.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value);
+
+            // Use your existing user repo / service
+            var user = await _userRepository.GetByIdAsync(userId); 
+            if (user == null)
+                throw new SecurityTokenException("User not found");
+
+            var jwtTokenResponse = new JwtTokenResponse
+            {
+                Token = tokens.Token,
+                RefreshToken = tokens.RefreshToken,
+                Expiration = DateTime.UtcNow.AddMinutes(
+                    Convert.ToDouble(_configuration["JwtSettings:ExpiryMinutes"]))
+            };
+
+            return (jwtTokenResponse, user);
+        }
+
 
         public async Task RevokeRefreshTokenAsync(string refreshToken)
         {

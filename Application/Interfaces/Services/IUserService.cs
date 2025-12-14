@@ -18,5 +18,8 @@ namespace MyApp1.Application.Interfaces.Services
         Task<bool> UpdateUserAsync(int userId,UpdateUserDto updatedUser);
         Task<IEnumerable<UserBadge>> GetUserBadgesAsync(int userId);
         Task<IEnumerable<User>> SearchUsersAsync(SearchUserDto filter);
+        Task<bool> ToggleUserActiveAsync(int userId);
+
+
     }
 }

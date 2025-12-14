@@ -67,11 +67,37 @@ namespace MyApp1.Infrastructure.Services
             {
                 int mentorId;
                 int skillId;
+
+                // 1) Check if user already rated this (session or group session)
+                if (dto.IsGroupSession)
+                {
+                    var existingGroupRating = await _ratingRepo.Table
+                        .FirstOrDefaultAsync(r =>
+                            r.SessionId == dto.SessionId &&          // here SessionId stores GroupSession.Id
+                            r.RatedByUserId == userId &&
+                            !r.IsDeleted);
+
+                    if (existingGroupRating != null)
+                        throw new InvalidOperationException("You have already rated this group session.");
+                }
+                else
+                {
+                    var existingRating = await _ratingRepo.Table
+                        .FirstOrDefaultAsync(r =>
+                            r.SessionId == dto.SessionId &&          // here SessionId stores Session.Id
+                            r.RatedByUserId == userId &&
+                            !r.IsDeleted);
+
+                    if (existingRating != null)
+                        throw new InvalidOperationException("You have already rated this session.");
+                }
+
+                // 2) Resolve mentor + skill, and verify attendance
                 if (dto.IsGroupSession)
                 {
                     var groupSession = await _groupSessionRepo.Table
                         .Include(gs => gs.Group)
-                        .ThenInclude(g => g.Mentor) // Ensures Mentor is loaded
+                        .ThenInclude(g => g.Mentor)
                         .FirstOrDefaultAsync(gs => gs.Id == dto.SessionId);
 
                     if (groupSession == null)
@@ -88,7 +114,7 @@ namespace MyApp1.Infrastructure.Services
                 else
                 {
                     var session = await _sessionRepo.Table
-                        .Include(s => s.Mentor) // Ensures Mentor is loaded
+                        .Include(s => s.Mentor)
                         .FirstOrDefaultAsync(s => s.Id == dto.SessionId);
 
                     if (session == null)
@@ -103,9 +129,11 @@ namespace MyApp1.Infrastructure.Services
                         throw new UnauthorizedAccessException("User did not attend the session");
                 }
 
+                // 3) Prevent mentor from rating own session
                 if (userId == mentorId)
                     throw new InvalidOperationException("Mentor cannot rate their own session");
 
+                // 4) Create rating (SessionId used for both normal and group sessions)
                 var rating = new Rating
                 {
                     SessionId = dto.SessionId,
@@ -123,11 +151,11 @@ namespace MyApp1.Infrastructure.Services
             }
             catch (Exception ex)
             {
-                // Log exception here with your logger as needed
-                // Example: _logger.LogError(ex, "Error in SubmitRatingAsync");
                 throw new Exception($"Error submitting rating: {ex.Message}", ex);
             }
         }
+
+
 
         public async Task<bool> UpdateRatingAsync(UpdateRatingDto dto, int userId)
         {

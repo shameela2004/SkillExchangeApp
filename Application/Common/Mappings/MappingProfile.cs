@@ -104,17 +104,33 @@ namespace MyApp1.Application.Common.Mappings
             CreateMap<CreateSessionDto, Session>();
             CreateMap<UpdateSessionDto, Session>();
 
+            CreateMap<Session, PrivateSesionDto>()
+    .IncludeBase<Session, SessionDto>()        // reuse base mapping
+    .ForMember(dest => dest.VideoLink, opt => opt.MapFrom(src => src.VideoLink));
+
             // Booking
             CreateMap<BookSessionDto, Booking>();
             CreateMap<Booking, BookingDto>()
+
                             .ForMember(d => d.MentorId, opt => opt.MapFrom(b => b.Session.Mentor.Id))
                             .ForMember(d => d.MentorName, opt => opt.MapFrom(b => b.Session.Mentor.Name))
                             .ForMember(d => d.MentorProfilePictureUrl, opt => opt.MapFrom(b => b.Session.Mentor.ProfilePictureUrl))
+                 .ForMember(dest=>dest.LearnerId,opt=>opt.MapFrom(src=>src.LearnerId))
                 .ForMember(dest => dest.LearnerName, opt => opt.MapFrom(src => src.Learner.Name))
+                .ForMember(dest=> dest.LearnerProfilePicture,opt=>opt.MapFrom(src=> src.Learner.ProfilePictureUrl))
                 .ForMember(dest => dest.SessionDate, opt => opt.MapFrom(src => src.Session.ScheduledAt))
+                 .ForMember(dest => dest.IsCompleted, opt => opt.MapFrom(src => src.Session.IsCompleted))
                 .ForMember(dest => dest.Skill, opt => opt.MapFrom(src => src.Session.Skill.Name))
-                .ForMember(dest => dest.Mode, opt => opt.MapFrom(src => src.Session.Mode));
+                .ForMember(dest => dest.Mode, opt => opt.MapFrom(src => src.Session.Mode))
+                .ForMember(dest => dest.MeetingLink, opt => opt.MapFrom(src => src.Session.VideoLink));
 
+
+            // Skill
+            CreateMap<Skill, SkillDto>()
+    .ForMember(d => d.IsActive, opt => opt.MapFrom(s => !s.IsDeleted)); // if you use IsDeleted
+
+            CreateMap<CreateSkillDto, Skill>();
+            CreateMap<UpdateSkillDto, Skill>();
 
 
         }

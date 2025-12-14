@@ -78,10 +78,12 @@ namespace MyApp1.API.Controllers.UserControllers
             var role = User.FindFirst(ClaimTypes.Role)?.Value ?? "";
 
             var sessions = await _sessionService.GetSessionsForMentorAsync(userId);
-            var dto = _mapper.Map<IEnumerable<SessionDto>>(sessions);
+            var dto = _mapper.Map<IEnumerable<PrivateSesionDto>>(sessions);
 
-            return Ok(ApiResponse<IEnumerable<SessionDto>>.SuccessResponse(dto, StatusCodes.Status200OK, "Sessions fetched"));
+            return Ok(ApiResponse<IEnumerable<PrivateSesionDto>>  // <-- change here
+                .SuccessResponse(dto, StatusCodes.Status200OK, "Sessions fetched"));
         }
+
         [HttpGet("mentor/{mentorId}")]
         public async Task<IActionResult> GetMentorSessions(int mentorId)
         {

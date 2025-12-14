@@ -13,21 +13,19 @@ namespace MyApp1.API.Controllers.AdminControllers
     public class AdminBookingController : ControllerBase
     {
         private readonly IBookingService _bookingService;
-        private readonly IGenericService<Booking> _genericBookingService;
         private readonly IMapper _mapper;
 
 
-        public AdminBookingController(IBookingService bookingService, IGenericService<Booking> genericBookingService, IMapper mapper)
+        public AdminBookingController(IBookingService bookingService, IMapper mapper)
         {
             _bookingService = bookingService;
-            _genericBookingService = genericBookingService;
             _mapper = mapper;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllBookings()
         {
-            var bookings = await _genericBookingService.GetAllAsync();
+            var bookings = await _bookingService.GetAllBookingsAsync();
             var dtos = _mapper.Map<IEnumerable<BookingDto>>(bookings);
             return Ok(ApiResponse<IEnumerable<BookingDto>>.SuccessResponse(dtos, StatusCodes.Status200OK, "All bookings fetched"));
         }

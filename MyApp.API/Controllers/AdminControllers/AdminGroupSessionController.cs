@@ -27,10 +27,12 @@ namespace MyApp1.API.Controllers.AdminControllers
         [HttpGet]
         public async Task<IActionResult> GetAllGroupSessions()
         {
-            var sessions = await _genericGroupSessionService.GetAllAsync();
+            var sessions = await _groupSessionService.GetAllForAdminAsync();
             var dtos = _mapper.Map<IEnumerable<GroupSessionDto>>(sessions);
-            return Ok(ApiResponse<IEnumerable<GroupSessionDto>>.SuccessResponse(dtos, StatusCodes.Status200OK, "Group sessions fetched"));
+            return Ok(ApiResponse<IEnumerable<GroupSessionDto>>.SuccessResponse(
+                dtos, StatusCodes.Status200OK, "Group sessions fetched"));
         }
+
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetGroupSessionById(int id)

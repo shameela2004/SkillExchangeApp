@@ -96,6 +96,23 @@ namespace MyApp1.Infrastructure.Services
             }
             return mentorsDto;
         }
+        public async Task<MentorDto> GetMentorByIdAsync(int userId)
+        {
+            var user = await _userRepo.Table
+                .Include(u => u.MentorProfile)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+                return null;
+            var mentorDto = _mapper.Map<MentorDto>(user);
+            var profileMedia = await _mediaService.GetMediaByReferenceAsync("UserProfile", user.Id);
+            var profileImage = profileMedia.OrderByDescending(m => m.Id).FirstOrDefault();
+            if (profileImage != null)
+            {
+                mentorDto.MentorProfilePictureUrl = $"/api/media/{profileImage.Id}";
+            }
+            return mentorDto;
+        }
+
 
         public async Task<bool> ApplyMentorAsync(int userId, MentorApplicationDto dto)
         {
@@ -151,6 +168,7 @@ namespace MyApp1.Infrastructure.Services
                 .Where(a => !a.IsDeleted)
                 .Select(a => new MentorAvailabilityDto
                 {
+                    Id = a.Id,
                     DayOfWeek = a.DayOfWeek,
                     StartTime = a.StartTime,
                     EndTime = a.EndTime

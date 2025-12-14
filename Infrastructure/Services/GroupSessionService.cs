@@ -3,6 +3,7 @@ using MyApp1.Application.DTOs.GroupSession;
 using MyApp1.Application.Interfaces.Services;
 using MyApp1.Domain.Entities;
 using MyApp1.Domain.Interfaces;
+using MyApp1.Application.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,12 +17,14 @@ namespace MyApp1.Infrastructure.Services
         private readonly IGenericRepository<GroupSession> _groupSessionRepo;
         private readonly IGenericRepository<Group> _groupRepo;
         private IGenericRepository<User> _userRepo;
+        private readonly IGenericRepository<Booking> _bookingRepo;
 
-        public GroupSessionService(IGenericRepository<GroupSession> groupSessionRepo, IGenericRepository<Group> groupRepo, IGenericRepository<User> userRepo)
+        public GroupSessionService(IGenericRepository<GroupSession> groupSessionRepo, IGenericRepository<Group> groupRepo, IGenericRepository<User> userRepo,IGenericRepository<Booking> bookingRepo)
         {
             _groupSessionRepo = groupSessionRepo;
             _groupRepo = groupRepo;
             _userRepo = userRepo;
+            _bookingRepo = bookingRepo;
         }
 
         public async Task<int> CreateGroupSessionAsync(CreateGroupSessionDto dto,int userId)
@@ -35,7 +38,7 @@ namespace MyApp1.Infrastructure.Services
                 Mode = dto.Mode,
                 Notes = dto.Notes,
                 Price = dto.Price,
-                VideoLink = null,
+                VideoLink = dto.VideoLink,
                 IsCompleted = false
             };
 
@@ -65,6 +68,9 @@ namespace MyApp1.Infrastructure.Services
             var entity = await _groupSessionRepo.GetByIdAsync(id);
             if (entity == null || entity.IsDeleted || entity.IsCompleted)
                 return false;
+            var bookings = _bookingRepo.Table.Where(b => b.GroupSessionId == id).ToListAsync();
+            if (bookings != null)
+                throw new ValidationException("Cannot delete a session that booked by an user");
             if (!await IsUserMentorOfGroupAsync(entity.GroupId, userId))
                 throw new UnauthorizedAccessException("User is not mentor of the group");
             _groupSessionRepo.Remove(entity);
@@ -83,6 +89,13 @@ namespace MyApp1.Infrastructure.Services
             _groupSessionRepo.Remove(entity);
             await _groupSessionRepo.SaveChangesAsync();
             return true;
+        }
+        public async Task<IEnumerable<GroupSession>> GetAllForAdminAsync()
+        {
+            return await _groupSessionRepo.Table
+                .Include(gs => gs.Group)
+                .Where(gs => !gs.IsDeleted)
+                .ToListAsync();
         }
 
         public async Task<GroupSession?> GetGroupSessionByIdAsync(int id)

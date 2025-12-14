@@ -14,6 +14,8 @@ namespace MyApp1.Application.Interfaces.Services
         Task<bool> UpdateGroupSessionAsync(int id, UpdateGroupSessionDto dto, int userId);
         Task<bool> DeleteGroupSessionAsync(int id, int userId);
         Task<bool> DeleteSessionByAdminAsync(int id, int userId);
+        Task<IEnumerable<GroupSession>> GetAllForAdminAsync();
+
         Task<GroupSession?> GetGroupSessionByIdAsync(int id);
         Task<IEnumerable<GroupSession>> GetGroupSessionsByGroupIdAsync(int groupId);
         Task<bool> MarkSessionCompletedAsync(int id, int userId);

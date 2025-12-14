@@ -18,5 +18,6 @@ namespace MyApp1.Application.DTOs.Post
         public int CommentCount { get; set; }
         public bool HasLiked { get; set; }
         public DateTime CreatedAt { get; set; }
+        public bool IsActive { get; set; }
     }
 }

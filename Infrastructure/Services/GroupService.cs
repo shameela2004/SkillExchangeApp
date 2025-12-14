@@ -24,11 +24,13 @@ namespace MyApp1.Infrastructure.Services
         public GroupService(IGenericRepository<Group> groupRepo,
                             IGenericRepository<GroupMember> groupMemberRepo,
                             IGenericRepository<GroupMessage> groupMessageRepo,
+                            IGenericRepository<User> userRepo,
                             IMapper mapper)
         {
             _groupRepo = groupRepo;
             _groupMemberRepo = groupMemberRepo;
             _groupMessageRepo = groupMessageRepo;
+            _userRepo = userRepo;
             _mapper = mapper;
         }
         public async Task<IEnumerable<Group>> GetMyGroups(int userId)
@@ -74,8 +76,23 @@ namespace MyApp1.Infrastructure.Services
             //{
             //     isAdmin = true;
             //}
+
             if (!await IsUserGroupAdmin(groupId, userId))
                 return false;
+            var group = await _groupRepo.GetByIdAsync(groupId);
+            if (group == null) return false;
+
+            _groupRepo.Remove(group);
+            await _groupRepo.SaveChangesAsync();
+            return true;
+        }
+        public async Task<bool> DeleteGroupByAdminAsync(int groupId, int adminUserId)
+        {
+            // Make sure this user is actually an Admin
+            var admin = await _userRepo.GetByIdAsync(adminUserId);
+            if (admin == null || admin.IsDeleted || admin.Role != "Admin")
+                throw new UnauthorizedAccessException("User is not an admin");
+
             var group = await _groupRepo.GetByIdAsync(groupId);
             if (group == null) return false;
 

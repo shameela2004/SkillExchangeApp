@@ -41,7 +41,7 @@ namespace MyApp1.Infrastructure.Services
         }
         public async Task<IEnumerable<PostDto>> GetPostsAsync(int page, int pageSize, string sortBy, bool descending, int userId)
         {
-            IQueryable<Post> query = _postRepository.Table.Include(p => p.User);
+            IQueryable<Post> query = _postRepository.Table.Include(p => p.User).Where(p=>p.IsActive);
 
             // Sorting
             query = (sortBy.ToLower(), descending) switch
@@ -89,7 +89,7 @@ namespace MyApp1.Infrastructure.Services
     bool descending)
         {
             IQueryable<Post> query = _postRepository.Table
-                .Where(p => p.UserId == profileUserId)
+                .Where(p => p.UserId == profileUserId && p.IsActive)
                 .Include(p => p.User);
 
             // Apply sorting (reuse your switch-case for sortBy/descending)
@@ -139,7 +139,7 @@ namespace MyApp1.Infrastructure.Services
         {
             var post = await _postRepository.Table
                 .Include(p => p.User)
-                .FirstOrDefaultAsync(p => p.Id == postId);
+                .FirstOrDefaultAsync(p => p.Id == postId && p.IsActive);
             if (post == null) return null;
             var postDto = new PostDto
             {
@@ -352,6 +352,83 @@ namespace MyApp1.Infrastructure.Services
             }).ToList();
 
             return postDtos;
+        }
+
+        // admin specific 
+        public async Task<IEnumerable<PostDto>> GetAllForAdminAsync(int? userId)
+        {
+            // Use IQueryable to include User and filter by userId if provided
+            var query =  _postRepository.Table
+                .Include(p => p.User)
+                .OrderByDescending(p => p.CreatedAt);
+
+            //if (userId.HasValue)
+            //{
+            //    query = query.Where(p => p.UserId == userId);
+            //}
+
+            var posts = await query.ToListAsync();
+
+            var result = posts.Select(p => new PostDto
+            {
+                PostId = p.Id,
+                UserId = p.UserId,
+                UserName = p.User?.Name ?? "",
+                UserProfilePictureUrl = p.User?.ProfilePictureUrl,
+                Content = p.Content,
+                MediaUrl = p.MediaUrl,
+                LikeCount = p.LikeCount,
+                CommentCount = p.CommentCount,
+                CreatedAt = p.CreatedAt,
+                IsActive = p.IsActive,
+                //HiddenReason = p.HiddenReason
+            });
+
+            return result;
+        }
+
+        public async Task<bool> HidePostAsync(int postId)
+        {
+            var post = await _postRepository.GetByIdAsync(postId);
+            if (post == null)
+            {
+                return false;
+            }
+
+            if (!post.IsActive)
+            {
+                // already hidden, nothing to do
+                return true;
+            }
+
+            post.IsActive = false;
+            //post.HiddenAt = DateTime.UtcNow;
+            //post.HiddenReason = reason;
+
+            await _postRepository.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UnhidePostAsync(int postId)
+        {
+            var post = await _postRepository.GetByIdAsync(postId);
+            if (post == null)
+            {
+                return false;
+            }
+
+            if (post.IsActive)
+            {
+                // already visible
+                return true;
+            }
+
+            post.IsActive = true; 
+            //post.HiddenAt = null;
+            //post.HiddenReason = null;
+
+            await _postRepository.SaveChangesAsync();
+            return true;
         }
 
     }

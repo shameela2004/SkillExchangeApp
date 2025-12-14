@@ -31,6 +31,15 @@ namespace MyApp1.API.Controllers.AdminControllers
         //    var pendingMentors = await _mentorService.GetPendingMentorApplicationsAsync();
         //    return Ok(ApiResponse<IEnumerable<MentorDto>>.SuccessResponse(pendingMentors, 200, "Pending mentor applications fetched"));
         //}
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetMentorById(int userId)
+        {
+            var mentor = await _mentorService.GetMentorByIdAsync(userId);
+            if (mentor == null)
+                return NotFound(ApiResponse<string>.FailResponse(404, "Mentor not found"));
+            return Ok(ApiResponse<MentorDto>.SuccessResponse(mentor, 200, "Mentor fetched"));
+        }
+
 
         [HttpPost("{userId}/approve")]
         public async Task<IActionResult> ApproveMentor(int userId)

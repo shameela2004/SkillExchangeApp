@@ -10,6 +10,7 @@ namespace MyApp1.Application.Interfaces.Services
     public interface IMentorService
     {
         Task<List<MentorDto>> SearchMentorsAsync(SearchMentorDto filter);
+        Task<MentorDto> GetMentorByIdAsync(int mentorId);
         Task<bool> ApplyMentorAsync(int userId, MentorApplicationDto dto);
         Task<string> GetMentorApplicationStatusAsync(int userId);
         Task<List<MentorAvailabilityDto>> GetAvailabilitiesAsync(int userId);

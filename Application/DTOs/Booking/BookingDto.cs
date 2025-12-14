@@ -12,7 +12,9 @@ namespace MyApp1.Application.DTOs.Booking
         public int Id { get; set; }
         public int? SessionId { get; set; }
         public int? GroupSessionId { get; set; }
+        public int LearnerId { get; set; }
         public string LearnerName { get; set; } = string.Empty;
+        public string LearnerProfilePicture { get; set; }
         public string Status { get; set; } = string.Empty;
         public DateTime? SessionDate { get; set; }
         public string Skill { get; set; } = string.Empty;
@@ -21,10 +23,13 @@ namespace MyApp1.Application.DTOs.Booking
         public int  MentorId { get; set; }
         public string MentorProfilePictureUrl { get; set; }
         public string MentorName { get; set; }
+        public bool IsCompleted { get; set; }
         public decimal PaymentAmount { get; set; }
         public bool IsPaid { get; set; }
         public string PaymentStatus { get; set; } = string.Empty;
         public bool IsCancelled { get; set; }
         public string? CancellationReason { get; set; }
+        public string? MeetingLink { get; set; }
+
     }
 }

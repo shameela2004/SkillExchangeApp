@@ -42,7 +42,7 @@ namespace MyApp1.Infrastructure.DependencyInjection
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IEmailSenderService, EmailSenderSevice>();
-            //services.AddScoped<ISkillService, SkillService>();
+            services.AddScoped<ISkillService, SkillService>();
             services.AddScoped<IOtpService, OtpService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IMentorService, MentorService>();
@@ -59,6 +59,7 @@ namespace MyApp1.Infrastructure.DependencyInjection
             services.AddScoped<IUserReportService, UserReportService>();
             services.AddScoped<IMediaService, MediaService>();
             services.AddScoped<IMessageService, MessageService>();
+            services.AddScoped<IAdminDashboardService, AdminDashboardService>();
 
 
 

@@ -8,8 +8,11 @@ namespace MyApp1.Domain.Entities
 {
     public class Rating : BaseEntity
     {
-        public int SessionId { get; set; }
-        public Session Session { get; set; } = null!;
+        public int? SessionId { get; set; }
+        public Session? Session { get; set; }
+
+        public int? GroupSessionId { get; set; }
+        public GroupSession? GroupSession { get; set; }
         public int RatedToUserId { get; set; } // Mentor
         public User RatedToUser { get; set; } = null!;
         public int RatedByUserId { get; set; } // Learner

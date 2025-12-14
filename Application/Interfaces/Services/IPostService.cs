@@ -22,5 +22,11 @@ namespace MyApp1.Application.Interfaces.Services
         Task<bool> ToggleLikePostAsync(int postId, int userId);
       Task<IEnumerable<PostDto>> GetFeedAsync(int userId, int page, int pageSize);
 
+        // Admin sepecific 
+        Task<IEnumerable<PostDto>> GetAllForAdminAsync(int? userId);
+        Task<bool> HidePostAsync(int postId);
+        Task<bool> UnhidePostAsync(int postId);
+
+
     }
 }

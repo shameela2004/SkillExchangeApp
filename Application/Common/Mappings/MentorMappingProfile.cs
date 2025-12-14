@@ -25,6 +25,7 @@ namespace MyApp1.Application.Common.Mappings
                .ForMember(dest => dest.Availabilities, opt => opt.MapFrom(src => src.MentorProfile != null ? src.MentorProfile.Availabilities : new List<MentorAvailability>())); 
 
             CreateMap<MentorAvailability, MentorAvailabilityDto>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.DayOfWeek, opt => opt.MapFrom(src => src.DayOfWeek))
                 .ForMember(dest => dest.StartTime, opt => opt.MapFrom(src => src.StartTime))
                 .ForMember(dest => dest.EndTime, opt => opt.MapFrom(src => src.EndTime));

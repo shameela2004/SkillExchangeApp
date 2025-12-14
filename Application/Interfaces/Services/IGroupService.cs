@@ -16,6 +16,8 @@ namespace MyApp1.Application.Interfaces.Services
         Task<IEnumerable<Group>> GetGroupsByMentorAsync(int mentorId);
         Task<bool> UpdateGroupAsync(int groupId, CreateGroupDto dto, int userId);
         Task<bool> DeleteGroupAsync(int groupId, int userId);
+        Task<bool> DeleteGroupByAdminAsync(int groupId, int adminUserId);
+
 
         Task<bool> AddMemberAsync(int groupId, int newMemberUserId, int requesterUserId);
         Task<bool> RemoveMemberAsync(int groupId, int memberUserId, int requesterUserId);

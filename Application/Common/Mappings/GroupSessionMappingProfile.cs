@@ -13,7 +13,9 @@ namespace MyApp1.Application.Common.Mappings
     {
         public GroupSessionMappingProfile()
         {
-            CreateMap<GroupSession, GroupSessionDto>();
+                CreateMap<GroupSession, GroupSessionDto>()
+    .ForMember(d => d.GroupName, opt => opt.MapFrom(s => s.Group.Name));
+
             CreateMap<CreateGroupSessionDto, GroupSession>();
             CreateMap<UpdateGroupSessionDto, GroupSession>();
         }

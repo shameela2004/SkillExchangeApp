@@ -93,6 +93,34 @@ namespace MyApp1.API.Controllers
         //    return Ok(ApiResponse<object>.SuccessResponse(new { token = tokens.Token, refreshToken = tokens.RefreshToken },StatusCodes.Status200OK,"Refresh Token Created Successfully"));
         //}
 
+        //[HttpPost("refresh")]
+        //public async Task<IActionResult> RefreshToken()
+        //{
+        //    var refreshToken = Request.Cookies["refreshToken"];
+        //    var accessToken = Request.Cookies["accessToken"];
+
+        //    if (string.IsNullOrEmpty(refreshToken))
+        //        return Unauthorized(ApiResponse<string>.FailResponse(StatusCodes.Status401Unauthorized, "No refresh token"));
+
+        //    // Validate/issue new tokens
+        //    var tokens = await _authService.RefreshTokenAsync(accessToken, refreshToken);
+
+        //    Response.Cookies.Append("accessToken", tokens.Token, new CookieOptions
+        //    {
+        //        HttpOnly = true,
+        //        Secure = Request.IsHttps,
+        //        SameSite = SameSiteMode.None,
+        //        Expires = DateTimeOffset.Now.AddHours(2)
+        //    });
+        //    Response.Cookies.Append("refreshToken", tokens.RefreshToken, new CookieOptions
+        //    {
+        //        HttpOnly = true,
+        //        Secure = Request.IsHttps,
+        //        SameSite = SameSiteMode.None,
+        //        Expires = DateTimeOffset.Now.AddDays(7)
+        //    });
+        //    return Ok(ApiResponse<object>.SuccessResponse(new { }, StatusCodes.Status200OK, "Refresh Token Created Successfully"));
+        //}
         [HttpPost("refresh")]
         public async Task<IActionResult> RefreshToken()
         {
@@ -100,18 +128,22 @@ namespace MyApp1.API.Controllers
             var accessToken = Request.Cookies["accessToken"];
 
             if (string.IsNullOrEmpty(refreshToken))
-                return Unauthorized(ApiResponse<string>.FailResponse(StatusCodes.Status401Unauthorized, "No refresh token"));
+                return Unauthorized(ApiResponse<string>.FailResponse(
+                    StatusCodes.Status401Unauthorized,
+                    "No refresh token"));
 
-            // Validate/issue new tokens
-            var tokens = await _authService.RefreshTokenAsync(accessToken, refreshToken);
+            // delegate business logic to service
+            var (tokens, user) = await _authService.RefreshTokenWithUserAsync(accessToken, refreshToken);
 
+            // write new cookies
             Response.Cookies.Append("accessToken", tokens.Token, new CookieOptions
             {
                 HttpOnly = true,
                 Secure = Request.IsHttps,
                 SameSite = SameSiteMode.None,
-                Expires = DateTimeOffset.Now.AddHours(2)
+                Expires = tokens.Expiration
             });
+
             Response.Cookies.Append("refreshToken", tokens.RefreshToken, new CookieOptions
             {
                 HttpOnly = true,
@@ -119,8 +151,15 @@ namespace MyApp1.API.Controllers
                 SameSite = SameSiteMode.None,
                 Expires = DateTimeOffset.Now.AddDays(7)
             });
-            return Ok(ApiResponse<object>.SuccessResponse(new { }, StatusCodes.Status200OK, "Refresh Token Created Successfully"));
+
+            // return user + token info to frontend
+            return Ok(ApiResponse<object>.SuccessResponse(
+                new { user, tokenResponse = tokens },
+                StatusCodes.Status200OK,
+                "Refresh Token Created Successfully"
+            ));
         }
+
 
 
         //[HttpPost("revoke")]

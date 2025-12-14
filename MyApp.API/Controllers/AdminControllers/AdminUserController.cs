@@ -42,5 +42,18 @@ namespace MyApp1.API.Controllers.AdminControllers
             var userDto = _mapper.Map<UserDto>(user);
             return Ok(ApiResponse<UserDto>.SuccessResponse(userDto, StatusCodes.Status200OK, "User fetched successfully"));
         }
+        [HttpPost("{userId}/toggle-active")]
+        public async Task<IActionResult> ToggleActive(int userId)
+        {
+            var isActive = await _userService.ToggleUserActiveAsync(userId);
+            // if ToggleUserActiveAsync throws on not found, no need for extra check
+
+            return Ok(ApiResponse<object>.SuccessResponse(
+                new { userId, isActive },  // ✅ include isActive
+                StatusCodes.Status200OK,
+                "User active status updated"
+            ));
+        }
+
     }
 }

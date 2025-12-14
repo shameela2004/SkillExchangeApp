@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MyApp1.Application.DTOs.Session;
 using MyApp1.Application.Interfaces.Services;
+using MyApp1.Application.Exceptions;
+
 using MyApp1.Domain.Entities;
 using MyApp1.Domain.Interfaces;
 using System;
@@ -48,11 +50,13 @@ namespace MyApp1.Infrastructure.Services
     {
         private readonly IGenericRepository<Session> _sessionRepository;
         private readonly IGenericRepository<UserSkill> _userSkillRepository;
+        private readonly IGenericRepository<Booking> _bookingRepository;
 
-        public SessionService(IGenericRepository<Session> sessionRepository, IGenericRepository<UserSkill> userSkillRepository)
+        public SessionService(IGenericRepository<Session> sessionRepository, IGenericRepository<UserSkill> userSkillRepository, IGenericRepository<Booking> bookingRepository)
         {
             _sessionRepository = sessionRepository;
             _userSkillRepository = userSkillRepository;
+            _bookingRepository = bookingRepository;
         }
 
         public async Task<int> CreateSessionAsync(CreateSessionDto dto, int mentorId)
@@ -69,6 +73,8 @@ namespace MyApp1.Infrastructure.Services
                 MentorId = mentorId,
                 SkillId = dto.SkillId,
                 ScheduledAt = dto.ScheduledAt,
+                VideoLink = dto.VideoLink,
+
                 Mode = dto.Mode,
                 Notes = dto.Notes,
                 Price = dto.Price ?? 0,
@@ -102,7 +108,11 @@ namespace MyApp1.Infrastructure.Services
             if (session.MentorId != userId) return false;
             if (DateTime.UtcNow > session.ScheduledAt || session.IsCompleted)
                 return false; // Cannot delete after session time or after completion
-
+            var bookings= _bookingRepository.Table.Where(b=>b.SessionId== sessionId).ToList();
+            if (bookings.Any())
+            {
+                throw new ValidationException("Cannot delete a session that already booked an User");
+            }
             _sessionRepository.Remove(session);
             await _sessionRepository.SaveChangesAsync();
 
@@ -164,6 +174,38 @@ namespace MyApp1.Infrastructure.Services
 
             return true;
         }
+
+        public async Task<IEnumerable<Session>> GetAllSessionsForAdminAsync(int? mentorId, bool? isCompleted)
+        {
+            IQueryable<Session> query = _sessionRepository.Table
+                .Include(s => s.Skill)
+                .Include(s => s.Mentor);
+
+            if (mentorId.HasValue)
+            {
+                query = query.Where(s => s.MentorId == mentorId.Value);
+            }
+
+            if (isCompleted.HasValue)
+            {
+                query = query.Where(s => s.IsCompleted == isCompleted.Value);
+            }
+
+            return await query
+                .OrderByDescending(s => s.ScheduledAt)
+                .ToListAsync();
+        }
+
+        public async Task<bool> DeleteSessionByAdminAsync(int sessionId)
+        {
+            var session = await _sessionRepository.GetByIdAsync(sessionId);
+            if (session == null) return false;
+
+            _sessionRepository.Remove(session);
+            await _sessionRepository.SaveChangesAsync();
+            return true;
+        }
+
     }
 
 

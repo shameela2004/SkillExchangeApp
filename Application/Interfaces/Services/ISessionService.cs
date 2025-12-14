@@ -18,6 +18,8 @@ namespace MyApp1.Application.Interfaces.Services
         Task<IEnumerable<Session>> GetSessionsForMentorAsync(int userId);
         Task<IEnumerable<Session>> GetUpcomingSessionsForMentorAsync(int mentorId);
         Task<bool> MarkSessionCompletedAsync(int sessionId);
+        Task<IEnumerable<Session>> GetAllSessionsForAdminAsync(int? mentorId, bool? isCompleted);
+        Task<bool> DeleteSessionByAdminAsync(int sessionId);
     }
 
 

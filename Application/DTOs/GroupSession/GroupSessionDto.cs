@@ -10,6 +10,8 @@ namespace MyApp1.Application.DTOs.GroupSession
     {
         public int Id { get; set; }
         public int GroupId { get; set; }
+        public string GroupName { get; set; } = string.Empty; 
+
         public DateTime ScheduledAt { get; set; }
         public string Mode { get; set; } = string.Empty;
         public string? Notes { get; set; }

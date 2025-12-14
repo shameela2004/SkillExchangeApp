@@ -186,10 +186,30 @@ namespace MyApp1.Infrastructure.Services
             return response;
         }
 
-
-        public async Task<Booking?> GetBookingByIdAsync(int bookingId)
+        public async Task<List<BookingDto>> GetAllBookingsAsync()
         {
-            return await _bookingRepo.GetByIdAsync(bookingId);
+             var bookings = await _bookingRepo.Table
+                .Include(b => b.Learner)
+                .Include(b => b.Session)
+                .ThenInclude(s => s.Skill)
+                .Include(b => b.Session)
+                .ThenInclude(s => s.Mentor)
+                .ToListAsync();
+            var bookingDtos = _mapper.Map<List<BookingDto>>(bookings);
+            return bookingDtos;
+        }
+        public async Task<BookingDto> GetBookingByIdAsync(int bookingId)
+        {
+            //return await _bookingRepo.GetByIdAsync(bookingId);
+            var booking  =await _bookingRepo.Table
+                .Include(b => b.Learner)
+                .Include(b => b.Session)
+                .ThenInclude(s => s.Skill)
+                .Include(b => b.Session)
+                .ThenInclude(s => s.Mentor)
+                .FirstOrDefaultAsync(b => b.Id == bookingId);
+            var bookingDto = _mapper.Map<BookingDto>(booking);
+            return bookingDto;
         }
 
         public async Task<IEnumerable<Booking>> GetBookingsByUserIdAsync(int userId)

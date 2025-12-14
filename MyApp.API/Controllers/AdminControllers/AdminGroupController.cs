@@ -38,11 +38,36 @@ namespace MyApp1.API.Controllers.AdminControllers
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
 
-            var success = await _groupService.DeleteGroupAsync(id, userId);
+            var success = await _groupService.DeleteGroupByAdminAsync(id, userId);
             if (!success)
                 return BadRequest(ApiResponse<string>.FailResponse(StatusCodes.Status400BadRequest, "Delete failed"));
 
             return Ok(ApiResponse<string>.SuccessResponse("Deleted successfully", StatusCodes.Status200OK, "Group deleted"));
         }
+
+
+        [HttpGet("{id}/members")]
+        public async Task<IActionResult> GetGroupMembers(int id)
+        {
+            var members = await _groupService.GetGroupMembersAsync(id);
+            return Ok(ApiResponse<IEnumerable<GroupMemberDto>>.SuccessResponse(
+                members, StatusCodes.Status200OK, "Group members fetched"));
+        }
+
+        [HttpGet("{id}/messages")]
+        public async Task<IActionResult> GetGroupMessages(int id)
+        {
+            var messages = await _groupService.GetMessagesAsync(id);
+            var dtos = messages.Select(m => new GroupMessageDto
+            {
+                Content = m.Content,
+                FilePath = m.FilePath,
+                FromUserId = m.FromUserId,
+                CreatedAt = m.CreatedAt
+            });
+            return Ok(ApiResponse<IEnumerable<GroupMessageDto>>.SuccessResponse(
+                dtos, StatusCodes.Status200OK, "Group messages fetched"));
+        }
+
     }
 }
