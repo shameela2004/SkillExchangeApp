@@ -363,4 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # Ignore local development secrets and config
-appsettings.Development.json
+ MyApp.API/appsettings.Development.json
+ MyApp.API/appsettings.Production.json
